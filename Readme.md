@@ -1,7 +1,7 @@
 # Личный проект «Шесть городов»
 
 * Студент: [Павел Мареев](https://up.htmlacademy.ru/nodejs-api/5/user/1343135).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Наумов](https://htmlacademy.ru/profile/naumov_evg).
 
 ---
 
