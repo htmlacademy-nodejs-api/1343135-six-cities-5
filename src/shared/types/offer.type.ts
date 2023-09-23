@@ -5,7 +5,7 @@ import { HousingType } from './housingType.type-enum.js';
 export type Offer = {
   title: string;
   description: string;
-  datePublished: string;
+  datePublished: Date;
   city: City;
   preview: string;
   photos: string[];
