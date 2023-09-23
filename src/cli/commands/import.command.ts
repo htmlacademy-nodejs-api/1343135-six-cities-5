@@ -5,6 +5,7 @@ import { City } from '../../shared/types/city.type-enum.js';
 import { HousingType } from '../../shared/types/housingType.type-enum.js';
 import { Feature } from '../../shared/types/feature.type-enum.js';
 import { booleanFromString } from '../../shared/utils/booleanFromString.js';
+import chalk from 'chalk';
 
 export class ImportCommand implements Command {
   public getName(): string {
@@ -48,10 +49,10 @@ export class ImportCommand implements Command {
 
       console.log(offers);
     } catch (error) {
-      console.error('File import failed');
+      console.error(chalk.red('File import failed'));
 
       if (error instanceof Error) {
-        console.error(error.message);
+        console.error(chalk.red(error.message));
       }
     }
   }
