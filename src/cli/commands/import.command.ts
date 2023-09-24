@@ -7,6 +7,7 @@ import { Feature } from '../../shared/types/feature.type-enum.js';
 import { booleanFromString } from '../../shared/utils/booleanFromString.js';
 import chalk from 'chalk';
 import { getErrorMessage } from '../../shared/utils/getErrorMessage.js';
+import { Location } from '../../shared/types/location.type.js';
 
 export class ImportCommand implements Command {
   public getName(): string {
@@ -42,7 +43,7 @@ export class ImportCommand implements Command {
             price: Number(price),
             features: features.split(';') as Feature[],
             authorId,
-            location: location.split(';').map((item) => Number(item)) as Offer['location'],
+            location: location.split(';').map((item) => Number(item)) as Location,
           };
 
           return offer;
