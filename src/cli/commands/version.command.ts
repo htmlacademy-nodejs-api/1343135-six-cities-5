@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { Command } from './command.interface.js';
 import { isObject } from '../../shared/utils/isObject.js';
 import chalk from 'chalk';
+import { getErrorMessage } from '../../shared/utils/getErrorMessage.js';
 
 export class VersionCommand implements Command {
   private fileName = 'package.json';
@@ -27,10 +28,7 @@ export class VersionCommand implements Command {
       console.log(chalk.green(version));
     } catch (error) {
       console.error(chalk.red(`Can not read version from file "${this.fileName}"`));
-
-      if (error instanceof Error) {
-        console.error(chalk.red(error.message));
-      }
+      console.error(chalk.red(getErrorMessage(error)));
     }
   }
 }
