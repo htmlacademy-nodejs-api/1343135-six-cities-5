@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { CliApplication } from './cli/cliApplication.js';
+import { CliApplication } from './cli/cli-application.js';
 import { HelpCommand, VersionCommand, ImportCommand } from './cli/commands/index.js';
 import process from 'node:process';
 

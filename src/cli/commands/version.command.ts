@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { Command } from './command.interface.js';
-import { isObject } from '../../shared/utils/isObject.js';
+import { isObject } from '../../shared/utils/is-object.js';
 import chalk from 'chalk';
-import { getErrorMessage } from '../../shared/utils/getErrorMessage.js';
+import { getErrorMessage } from '../../shared/utils/get-error-message.js';
 
 export class VersionCommand implements Command {
   private fileName = 'package.json';
