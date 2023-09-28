@@ -42,7 +42,7 @@ export class TSVOfferParser {
       price: Number(price),
       features: features.split(';') as Feature[],
       authorId,
-      location: location.split(';').map((item) => Number(item)) as Location,
+      location: location.split(';').map(Number) as Location,
     };
 
     return offer;
