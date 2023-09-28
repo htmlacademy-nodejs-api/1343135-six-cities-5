@@ -1,4 +1,4 @@
-import { CommandParser } from './commandParser.js';
+import { CommandParser } from './command-parser.js';
 import { Command } from './commands/command.interface.js';
 
 export class CliApplication {
