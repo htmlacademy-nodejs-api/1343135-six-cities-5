@@ -5,7 +5,7 @@ export class PinoLogger implements Logger {
   private readonly logger: PinoInstance;
 
   constructor() {
-    this.logger = pino();
+    this.logger = pino({ level: 'debug' });
   }
 
   public debug(msg: string, ...args: unknown[]): void {
