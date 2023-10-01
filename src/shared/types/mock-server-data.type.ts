@@ -1,6 +1,6 @@
-import { City } from './city.type-enum.js';
-import { Feature } from './feature.type-enum.js';
-import { HousingType } from './housing-type.type-enum.js';
+import { CityValue } from './city.enum.js';
+import { FeatureValue } from './feature.enum.js';
+import { HousingTypeValue } from './housing-type.enum.js';
 import { Location } from './location.type.js';
 
 export type MockServerData = {
@@ -10,11 +10,11 @@ export type MockServerData = {
     start: string;
     end: string;
   },
-  city: City[];
+  city: CityValue[];
   preview: string[];
   photos: string[];
-  housingType: HousingType[];
-  feature: Feature[];
+  housingType: HousingTypeValue[];
+  feature: FeatureValue[];
   authorId: string[];
   location: Location[];
 }

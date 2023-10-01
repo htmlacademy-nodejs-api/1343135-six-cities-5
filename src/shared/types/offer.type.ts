@@ -1,23 +1,23 @@
-import { City } from './city.type-enum.js';
-import { Feature } from './feature.type-enum.js';
-import { HousingType } from './housing-type.type-enum.js';
+import { CityValue } from './city.enum.js';
+import { FeatureValue } from './feature.enum.js';
+import { HousingTypeValue } from './housing-type.enum.js';
 import { Location } from './location.type.js';
 
 export type Offer = {
   title: string;
   description: string;
   datePublished: Date;
-  city: City;
+  city: CityValue;
   preview: string;
   photos: string[];
   isPremium: boolean;
   isFavorite: boolean;
   rating: number;
-  housingType: HousingType;
+  housingType: HousingTypeValue;
   roomCount: number;
   tenantCount: number;
   price: number;
-  features: Feature[];
+  features: FeatureValue[];
   authorId: string;
   location: Location;
 }
