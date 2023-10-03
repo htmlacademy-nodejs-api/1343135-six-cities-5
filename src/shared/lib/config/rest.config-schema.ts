@@ -16,11 +16,35 @@ export const restConfigSchema = convict({
     env: 'SALT',
     default: ''
   },
+  DB_USERNAME: {
+    doc: 'Database server username',
+    format: String,
+    env: 'DB_USERNAME',
+    default: ''
+  },
+  DB_PASSWORD: {
+    doc: 'Database server password',
+    format: String,
+    env: 'DB_PASSWORD',
+    default: ''
+  },
   DB_HOST: {
-    doc: 'IP address of the database server (MongoDB)',
-    format: 'ipaddress',
+    doc: 'Database server hostname',
+    format: String,
     env: 'DB_HOST',
-    default: '127.0.0.1'
+    default: ''
+  },
+  DB_PORT: {
+    doc: 'Database server port',
+    format: 'port',
+    env: 'DB_PORT',
+    default: ''
+  },
+  DB_NAME: {
+    doc: 'Database name',
+    format: String,
+    env: 'DB_NAME',
+    default: 'buy-and-sell'
   },
 });
 
