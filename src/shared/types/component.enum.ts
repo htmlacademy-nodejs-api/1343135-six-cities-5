@@ -3,4 +3,6 @@ export const Component = {
   Logger: Symbol.for('Logger'),
   Config: Symbol.for('Config'),
   DatabaseClient: Symbol.for('DatabaseClient'),
+  OfferService: Symbol.for('OfferService'),
+  OfferModel: Symbol.for('OfferModel'),
 } as const;
