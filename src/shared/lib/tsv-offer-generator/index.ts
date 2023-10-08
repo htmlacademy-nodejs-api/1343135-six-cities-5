@@ -28,14 +28,13 @@ export class TSVOfferGenerator {
     const preview = getRandomItem(serverMock.preview);
     const photos = getRandomChunk(serverMock.photos, PHOTO_COUNT).join(';');
     const isPremium = getRandomBoolean();
-    const isFavorite = getRandomBoolean();
     const rating = getRandomNumber(RATING_MIN, RATING_MAX, RATING_PRECISION);
     const housingType = getRandomItem(serverMock.housingType);
     const roomCount = getRandomNumber(ROOM_COUNT_MIN, ROOM_COUNT_MAX);
     const tenantCount = getRandomNumber(TENANT_COUNT_MIN, TENANT_COUNT_MAX);
     const price = getRandomNumber(PRICE_MIN, PRICE_MAX);
     const features = getRandomChunk(serverMock.feature).join(';');
-    const authorId = getRandomItem(serverMock.authorId);
+    const user = getRandomItem(serverMock.users).join(';');
     const location = getRandomItem(serverMock.location).map(String).join(';');
 
     return [
@@ -46,14 +45,13 @@ export class TSVOfferGenerator {
       preview,
       photos,
       isPremium,
-      isFavorite,
       rating,
       housingType,
       roomCount,
       tenantCount,
       price,
       features,
-      authorId,
+      user,
       location
     ].join('\t').concat('\n');
   }
