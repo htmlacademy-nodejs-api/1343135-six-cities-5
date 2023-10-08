@@ -74,17 +74,56 @@
       "Towels",
       "Fridge"
     ],
-    "authorId": [
-      "7f3c2b41-84ef-49dd-a925-51e41f732fc1",
-      "628a18c7-356d-4b9c-b5e6-9e980f4c1a85",
-      "d2743e58-16a2-4c1d-8b17-907df581c5ea",
-      "9aeb8205-13bb-4a42-b8ef-6b72b36f4d3d",
-      "f28376a7-8d4e-4a32-ba5f-1e24d8ab2f2d",
-      "b059a3c2-1e11-4a12-8b8d-5d9f4bfc0656",
-      "eeb4d50a-45c8-4b9e-b9db-0c9d5cfc1735",
-      "7619b56b-42ac-4f15-bbd0-0c0d8a3184b3",
-      "5d97f951-5860-4c79-985d-1b396ccf8d61",
-      "c8fb7102-2ab3-4211-8a0f-1d96db9a94c5"
+    "users": [
+      [
+        "Sarah Johnson",
+        "sarah.johnson@example.com",
+        "SecurePassword123",
+        "",
+        ""
+      ],
+      [
+        "John Smith",
+        "john.smith@example.com",
+        "StrongPass456",
+        "pro",
+        ""
+      ],
+      [
+        "Emily Davis",
+        "emily.davis@example.com",
+        "Password12345",
+        "",
+        "https://via.placeholder.com/150"
+      ],
+      [
+        "Michael Lee",
+        "michael.lee@example.com",
+        "SecretPass789",
+        "",
+        ""
+      ],
+      [
+        "Laura Anderson",
+        "laura.anderson@example.com",
+        "Secure1234",
+        "pro",
+        ""
+      ],
+      [
+        "David Wilson",
+        "david.wilson@example.com",
+        "DavidPass123",
+        "default",
+        "https://via.placeholder.com/150"
+      ],
+      [
+        "Jessica Brown",
+        "jessica.brown@example.com",
+        "StrongPassword789",
+        "pro",
+        "https://via.placeholder.com/150"
+      ]
     ],
     "location": [
       [48.85661, 2.351499],

@@ -25,7 +25,7 @@ export class PinoLogger implements Logger {
       ],
     });
 
-    this.logger = pino({}, multiTransport);
+    this.logger = pino({ level: 'debug' }, multiTransport);
   }
 
   public debug(msg: string, ...args: unknown[]): void {
