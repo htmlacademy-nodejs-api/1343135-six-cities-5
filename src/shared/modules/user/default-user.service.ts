@@ -32,7 +32,7 @@ export class DefaultUserService implements UserService {
   }
 
   public async findByEmail(email: string) {
-    return await this.userModel.findOne({ email });
+    return this.userModel.findOne({ email });
   }
 
   public async findOrCreate(dto: CreateUserDto, salt: string) {

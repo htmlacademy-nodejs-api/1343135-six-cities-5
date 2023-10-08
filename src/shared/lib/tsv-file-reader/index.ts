@@ -23,7 +23,10 @@ export class TSVFileReader extends EventEmitter {
       endOfLineIndex = currentString.indexOf('\n');
 
       while (endOfLineIndex >= 0) {
-        this.emit('line', currentString.slice(0, endOfLineIndex + 1));
+        await new Promise((resolve) => {
+          this.emit('line', currentString.slice(0, endOfLineIndex + 1), resolve);
+        });
+
         lineCount++;
         currentString = currentString.slice(endOfLineIndex + 1);
         endOfLineIndex = currentString.indexOf('\n');

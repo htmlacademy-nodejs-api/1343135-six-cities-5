@@ -44,7 +44,7 @@ export const restConfigSchema = convict({
     doc: 'Database name',
     format: String,
     env: 'DB_NAME',
-    default: 'buy-and-sell'
+    default: 'six-cities'
   },
 });
 
