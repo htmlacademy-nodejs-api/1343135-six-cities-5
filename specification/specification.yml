@@ -1,0 +1,762 @@
+openapi: 3.0.2
+info:
+  title: API server for six-cities
+  description: List of the resources and routes for six-cities service
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+
+tags:
+  - name: offers
+    description: for operations with offers
+  - name: favorite
+    description: for operations with the list of favorite offers
+  - name: users
+    description: for operations with users
+  - name: comments
+    description: for operations with comments
+
+paths:
+  /offers:
+    get:
+      tags:
+        - offers
+      summary: Get offers
+      description: Get the list of offers
+      parameters:
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+        - name: isPremium
+          in: query
+          description: is premium offer
+          schema:
+            type: string
+            example: true
+        - name: isFavorite
+          in: query
+          description: offer is added to favorites
+          schema:
+            type: boolean
+            example: true
+        - name: city
+          in: query
+          description: name of the city
+          schema:
+            $ref: '#/components/schemas/city'
+
+      responses:
+        "200":
+          description: List of the offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerRdo'
+
+    post:
+      tags:
+        - offers
+      summary: New offer
+      description: Create new offer
+
+      security:
+        - BearerAuth: []
+
+      requestBody:
+        description: New offer data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offerDto'
+        required: true
+
+      responses:
+        "201":
+          description: Offer created. Offer entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+
+        "400":
+          description: Invalid offer data is provided
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /offers/{id}:
+    get:
+      tags:
+        - offers
+      summary: Get offer by id
+      description: Get offer by id
+      parameters:
+        - name: id
+          in: path
+          description: Id of the offer
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2538
+
+      responses:
+        "200":
+          description: Offer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+        "404":
+          description: Offer not found
+
+    patch:
+      tags:
+        - offers
+      summary: Update offer
+      description: Update offer
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          description: Id of the offer
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2538
+
+      requestBody:
+        description: Offer fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offerDto'
+        required: true
+
+      responses:
+        "200":
+          description: Updated offer entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+
+        "400":
+          description: Invalid offer data is provided
+
+        "401":
+          $ref: '#/components/responses/401'
+
+        "404":
+          description: Offer not found
+
+    delete:
+      tags:
+        - offers
+      summary: Delete offer
+      description: Delete offer by id
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          description: Id of the offer
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2538
+
+      responses:
+        "204":
+          description: Offer is deleted
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /offers/{id}/comments:
+    get:
+      tags:
+        - comments
+      summary: Get comment list
+      description: Get the list of comments for specified offer
+      parameters:
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+
+      responses:
+        "200":
+          description: List of comments for specified offer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/commentRdo'
+
+        "404":
+          description: Offer with specified {id} not found
+
+    post:
+      tags:
+        - comments
+      summary: Create comment
+      description: Create new comment for the offer
+
+      security:
+        - BearerAuth: []
+
+      requestBody:
+        description: New comment data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/commentDto'
+        required: true
+
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/commentRdo'
+
+        "400":
+          description: Invalid comment data is provided
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /offers/favorite:
+    get:
+      tags:
+        - favorite
+      summary: Get favorite offers
+      description: Get the list of user's favorite offers
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+
+      responses:
+        "200":
+          description: List of the favorite offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerRdo'
+
+        "401":
+          $ref: '#/components/responses/401'
+
+    post:
+      tags:
+        - favorite
+      summary: Add to favorite
+      description: Add offers to list of favorites by ids
+
+      security:
+        - BearerAuth: []
+
+      requestBody:
+        description: Offer ids
+        content:
+          application/json:
+            schema:
+              type: string
+              example: 6522aa1decfcf1bc655a2547
+
+        required: true
+
+      responses:
+        "201":
+          description: Offer is added to favorite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+
+        "400":
+          description: Invalid offer data is provided
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /offers/favorite/{id}:
+    delete:
+      tags:
+        - favorite
+      summary: Delete from favorite
+      description: Delete offers form favorite by id
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          description: Id of the favorite offer
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2538
+
+      responses:
+        "204":
+          description: Offers are deleted form favorite
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /offers/premium/{city}:
+    get:
+      tags:
+        - offers
+      summary: Get premium offers list
+      description: Get the list of premium offers for specified city
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/city'
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+
+
+      responses:
+        "200":
+          description: List of premium offers for specified city
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerRdo'
+
+        "400":
+          description: Invalid city name
+
+
+  /users/signup:
+    post:
+      tags:
+        - users
+      summary: Signup
+      description: Create new user
+
+      requestBody:
+        description: New user data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userDto'
+        required: true
+
+      responses:
+        "201":
+          description: New user created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRdo'
+
+        "400":
+          description: Invalid user data is provided
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Login
+      description: Login user
+
+      requestBody:
+        description: Login data
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                email:
+                  type: string
+                  example: felix-at-home@mail.com
+
+                password:
+                  type: string
+                  example: secret_2000
+
+        required: true
+
+      responses:
+        "204":
+          description: Logged in successfully
+
+        "400":
+          description: Invalid login data is provided
+
+  /users/logout:
+    get:
+      tags:
+        - users
+      summary: Logout
+      description: Logout user
+
+      security:
+        - BearerAuth: []
+
+      responses:
+        "204":
+          description: Logged out successfully
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /users/status:
+    get:
+      tags:
+        - users
+      summary: User login status
+      description: Current user login status
+
+      security:
+        - BearerAuth: []
+
+      responses:
+        "200":
+          description: Current user status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRdo'
+
+        "401":
+          $ref: '#/components/responses/401'
+
+components:
+  schemas:
+    offerDto:
+      type: object
+
+      properties:
+        title:
+          type: string
+          example: Cozy flat in the city center
+
+        description:
+          type: string
+          example: Super offer for travellers who appreciate comfort
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        preview:
+          type: string
+          example: https://picsum.photos/200
+
+        photos:
+          type: array
+          items:
+            type: string
+          example:
+            - https://picsum.photos/800/480
+            - https://picsum.photos/1200/800
+            - https://picsum.photos/600/400
+            - https://picsum.photos/800/1200
+            - https://picsum.photos/400/480
+            - https://picsum.photos/1125/366
+
+        isPremium:
+          type: boolean
+          example: true
+
+        housingType:
+          $ref: '#/components/schemas/housingType'
+
+        roomCount:
+          type: integer
+          format: int32
+          example: 3
+
+        tenantCount:
+          type: integer
+          format: int32
+          example: 4
+
+        price:
+          type: integer
+          format: int32
+          example: 10000
+
+        features:
+          $ref: '#/components/schemas/features'
+
+        location:
+          type: array
+          minLength: 2
+          maxLength: 2
+          items:
+            type: number
+          example:
+            - 48.85661
+            - 2.351499
+
+    offerRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6522aa1decfcf1bc655a253d
+
+        title:
+          type: string
+          example: Cozy flat in the city center
+
+        description:
+          type: string
+          example: Super offer for travellers who appreciate comfort
+
+        createdAt:
+          type: string
+          example: '2023-09-23T08:40:51.065Z'
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        preview:
+          type: string
+          example: https://picsum.photos/200
+
+        photos:
+          type: array
+          items:
+            type: string
+          example:
+            - https://picsum.photos/800/480
+            - https://picsum.photos/1200/800
+            - https://picsum.photos/600/400
+            - https://picsum.photos/800/1200
+            - https://picsum.photos/400/480
+            - https://picsum.photos/1125/366
+
+        isPremium:
+          type: boolean
+          example: true
+
+        isFavorite:
+          type: boolean
+          example: false
+
+        rating:
+          type: number
+          example: 4.5
+
+        housingType:
+          $ref: '#/components/schemas/housingType'
+
+        roomCount:
+          type: integer
+          format: int32
+          example: 3
+
+        tenantCount:
+          type: integer
+          format: int32
+          example: 4
+
+        price:
+          type: integer
+          format: int32
+          example: 10000
+
+        features:
+          $ref: '#/components/schemas/features'
+
+        author:
+          $ref: '#/components/schemas/userRdo'
+
+        location:
+          type: array
+          minLength: 2
+          maxLength: 2
+          items:
+            type: number
+          example:
+            - 48.85661
+            - 2.351499
+
+        commentCount:
+          type: integer
+          format: int32
+          example: 23
+
+    userDto:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - type
+
+      properties:
+
+        name:
+          type: string
+          example: Felix
+
+        email:
+          type: string
+          example: felix-at-home@mail.com
+
+        password:
+          type: string
+          example: secret_2000
+
+        type:
+          $ref: '#/components/schemas/userType'
+
+        avatar:
+          type: string
+          example: http://my_avatar.uk/felix.jpg
+
+
+    userRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6522aa1decfcf1bc655a253d
+
+        name:
+          type: string
+          example: Felix
+
+        email:
+          type: string
+          example: felix-at-home@mail.com
+
+        type:
+          $ref: '#/components/schemas/userType'
+
+        avatar:
+          type: string
+          example: http://my_avatar.uk/felix.jpg
+
+    city:
+      enum:
+        - Paris
+        - Cologne
+        - Brussels
+        - Amsterdam
+        - Hamburg
+        - Dusseldorf
+      example: Paris
+
+    housingType:
+      enum:
+        - apartment
+        - house
+        - room
+        - hotel
+      example: apartment
+
+    features:
+      type: array
+      items:
+        enum:
+          - Breakfast
+          - Air conditioning
+          - Laptop friendly workspace
+          - Baby seat
+          - Washer
+          - Towels
+          - Fridge
+      example:
+        - Breakfast
+        - Baby seat
+        - Towels
+
+    userType:
+      enum:
+        - default
+        - pro
+      example: default
+
+    commentDto:
+      type: object
+
+      required:
+        - text
+
+      properties:
+        text:
+          type: string
+          example: Great place, surely will stay here again when I'm in Amsterdam!
+
+    commentRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6522aa1decfcf1bc655a255d
+
+        author:
+          $ref: '#/components/schemas/userRdo'
+
+        text:
+          type: string
+          example: Great place, surely will stay here again when I'm in Amsterdam!
+
+        datePublished:
+          type: string
+          example: '2023-10-08T13:09:49.523Z'
+
+        rating:
+          type: number
+          example: 4.9
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: max number of items in the response
+      required: false
+      schema:
+        type: integer
+        format: int32
+        example: 10
+
+    offset:
+      name: offset
+      in: query
+      description: offset from the start of the list
+      required: false
+      schema:
+        type: integer
+        format: int32
+        example: 20
+
+  responses:
+    "401":
+      description: User is unauthorized
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
