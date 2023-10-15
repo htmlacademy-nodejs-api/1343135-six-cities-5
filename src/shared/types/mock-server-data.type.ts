@@ -12,6 +12,6 @@ export type MockServerData = {
   photos: string[];
   housingType: HousingTypeValue[];
   feature: FeatureValue[];
-  users: [string, string, string, UserTypeValue | '', string][];
+  users: [string, string, string, UserTypeValue, string][];
   location: Location[];
 }

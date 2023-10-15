@@ -5,6 +5,7 @@ import { UserService } from './user-service.interface.js';
 import { UserEntity } from './user.entity.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/index.js';
+import { LoginUserDto } from './dto/login-user.dto.js';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -43,5 +44,18 @@ export class DefaultUserService implements UserService {
     }
 
     return this.create(dto, salt);
+  }
+
+  public async login(dto: LoginUserDto, salt: string) {
+    const user = await this.findByEmail(dto.email);
+
+    if (!user) {
+      throw new Error(`User with email ${dto.email} not found`);
+    }
+
+    const isCorrectPassword = user.checkPassword(dto.password, salt);
+
+    // TODO: token
+    return isCorrectPassword ? 'success' : 'fail';
   }
 }

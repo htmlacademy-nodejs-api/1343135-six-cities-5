@@ -20,7 +20,7 @@ export type Offer = {
     name: string;
     email: string;
     password: string;
-    type?: UserTypeValue;
+    type: UserTypeValue;
     avatar?: string;
   };
   location: Location;

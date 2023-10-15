@@ -29,7 +29,7 @@ export class TSVOfferParser {
       name: authorArray[0],
       email: authorArray[1],
       password: authorArray[2],
-      ...(authorArray[3] ? { type: (authorArray[3] as UserTypeValue) } : null),
+      type: (authorArray[3] as UserTypeValue),
       ...(authorArray[4] ? { avatar: authorArray[4] } : null),
     };
 
