@@ -722,7 +722,7 @@ components:
           type: string
           example: Great place, surely will stay here again when I'm in Amsterdam!
 
-        datePublished:
+        createdAt:
           type: string
           example: '2023-10-08T13:09:49.523Z'
 

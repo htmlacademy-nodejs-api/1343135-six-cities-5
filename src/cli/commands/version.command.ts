@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { Command } from './command.interface.js';
-import { isObject } from '../../shared/utils/is-object.js';
+import { isObject } from '../../shared/utils/object.js';
 import chalk from 'chalk';
 import { getErrorMessage } from '../../shared/utils/get-error-message.js';
 
