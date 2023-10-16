@@ -8,6 +8,7 @@ import { CreateOfferDto, OfferService } from '../../shared/modules/offer/index.j
 import { DatabaseClient } from '../../shared/lib/database-client/index.js';
 import { Logger } from '../../shared/lib/logger/index.js';
 import { Config, RestConfigSchema } from '../../shared/lib/config/index.js';
+import { getMongoUrl } from '../../shared/utils/database.js';
 
 export class ImportCommand implements Command {
   constructor(
@@ -18,9 +19,17 @@ export class ImportCommand implements Command {
     private readonly offerService: OfferService,
   ) {}
 
-  private async connectToDatabase(databaseUri: string) {
+  private async connectToDatabase(databaseUri?: string) {
     try {
-      await this.databaseClient.connect(databaseUri);
+      const uri = databaseUri || getMongoUrl({
+        username: this.config.get('DB_USERNAME'),
+        password: this.config.get('DB_PASSWORD'),
+        host: this.config.get('DB_HOST'),
+        port: this.config.get('DB_PORT'),
+        databaseName: this.config.get('DB_NAME'),
+      });
+
+      await this.databaseClient.connect(uri);
     } catch (error) {
       const errorToThrow = error instanceof Error ? error : new Error('Database connection error');
       this.logger.error(`Database connection error. URI: ${databaseUri}`, errorToThrow);
@@ -56,10 +65,6 @@ export class ImportCommand implements Command {
     try {
       if (!filepath) {
         throw new Error('Path to *.tsv file should be provided');
-      }
-
-      if (!databaseUri) {
-        throw new Error('Database connection URI should be provided');
       }
 
       await this.connectToDatabase(databaseUri);
