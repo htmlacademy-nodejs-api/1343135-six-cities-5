@@ -270,7 +270,7 @@ paths:
         - BearerAuth: []
 
       requestBody:
-        description: Offer ids
+        description: Offer id
         content:
           application/json:
             schema:
