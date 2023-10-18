@@ -11,45 +11,41 @@ export class TSVOfferParser {
     const [
       title,
       description,
-      datePublished,
       city,
       preview,
       photos,
       isPremium,
-      rating,
       housingType,
       roomCount,
       tenantCount,
       price,
       features,
-      userString,
+      authorString,
       location
     ] = line.trim().split('\t');
 
-    const userArray = userString.split(';');
-    const user = {
-      name: userArray[0],
-      email: userArray[1],
-      password: userArray[2],
-      ...(userArray[3] ? { type: (userArray[3] as UserTypeValue) } : null),
-      ...(userArray[4] ? { avatar: userArray[4] } : null),
+    const authorArray = authorString.split(';');
+    const author = {
+      name: authorArray[0],
+      email: authorArray[1],
+      password: authorArray[2],
+      type: (authorArray[3] as UserTypeValue),
+      ...(authorArray[4] ? { avatar: authorArray[4] } : null),
     };
 
     const offer: Offer = {
       title,
       description,
-      datePublished: new Date(datePublished),
       city: city as CityValue,
       preview,
       photos: photos.split(';'),
       isPremium: booleanFromString(isPremium),
-      rating: Number(rating),
       housingType: housingType as HousingTypeValue,
       roomCount: Number(roomCount),
       tenantCount: Number(tenantCount),
       price: Number(price),
       features: features.split(';') as FeatureValue[],
-      user,
+      author,
       location: location.split(';').map(Number) as Location,
     };
 

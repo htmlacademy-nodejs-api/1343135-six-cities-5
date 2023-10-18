@@ -24,10 +24,6 @@
       "Step back in time with this 2-bedroom apartment featuring classic hardwood floors. Nestled in a historic neighborhood.",
       "Elevate your lifestyle with this stunning 3-bedroom penthouse boasting city skyline views and a rooftop pool."
     ],
-    "datePublished": {
-      "start": "2021-10-11T22:00:00.000Z",
-      "end": "2023-09-03T13:00:00.000Z"
-    },
     "city": [
       "Paris",
       "Cologne",
@@ -79,7 +75,7 @@
         "Sarah Johnson",
         "sarah.johnson@example.com",
         "SecurePassword123",
-        "",
+        "default",
         ""
       ],
       [
@@ -93,14 +89,14 @@
         "Emily Davis",
         "emily.davis@example.com",
         "Password12345",
-        "",
+        "default",
         "https://via.placeholder.com/150"
       ],
       [
         "Michael Lee",
         "michael.lee@example.com",
         "SecretPass789",
-        "",
+        "default",
         ""
       ],
       [

@@ -21,9 +21,6 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ required: true, trim: true })
   public description!: string;
 
-  @prop({ required: true })
-  public datePublished!: Date;
-
   @prop({ required: true, enum: City })
   public city!: CityValue;
 
@@ -35,9 +32,6 @@ export class OfferEntity extends defaultClasses.TimeStamps {
 
   @prop({ required: true })
   public isPremium!: boolean;
-
-  @prop({ required: true })
-  public rating!: number;
 
   @prop({ required: true, enum: HousingType })
   public housingType!: HousingTypeValue;
@@ -63,6 +57,8 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ required: true, default: 0 })
   public commentCount!: number;
 
+  @prop({ required: true, default: 0 })
+  public rating!: number;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

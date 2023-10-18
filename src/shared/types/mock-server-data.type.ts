@@ -7,15 +7,11 @@ import { UserTypeValue } from './user-type.enum.js';
 export type MockServerData = {
   title: string[],
   description: string[],
-  datePublished: {
-    start: string;
-    end: string;
-  },
   city: CityValue[];
   preview: string[];
   photos: string[];
   housingType: HousingTypeValue[];
   feature: FeatureValue[];
-  users: [string, string, string, UserTypeValue | '', string][];
+  users: [string, string, string, UserTypeValue, string][];
   location: Location[];
 }
