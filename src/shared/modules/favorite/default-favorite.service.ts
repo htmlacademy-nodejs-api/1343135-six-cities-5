@@ -2,7 +2,7 @@ import { types } from '@typegoose/typegoose';
 import { injectable, inject } from 'inversify';
 import { Pagination } from '../../types/pagination.js';
 import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity, FavoriteService } from './index.js';
-import { DEFAULT_LIMIT, DEFAULT_OFFSET } from './consts.js';
+import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 
 @injectable()
@@ -12,8 +12,8 @@ export class DefaultFavoriteService implements FavoriteService {
   ) {}
 
   public async findByUserId(userId: string, pagination?: Pagination | undefined): Promise<types.DocumentType<FavoriteEntity>[]> {
-    const calculatedOffset = pagination?.offset ?? DEFAULT_OFFSET;
-    const calculatedLimit = pagination?.limit ?? DEFAULT_LIMIT;
+    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
+    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
 
     const result = await this.favoriteModel
       .aggregate([
@@ -28,15 +28,6 @@ export class DefaultFavoriteService implements FavoriteService {
         },
         { $unwind: '$offers' },
         { $replaceWith: '$offers' },
-        {
-          $lookup: {
-            from: 'users',
-            foreignField: '_id',
-            localField: 'author',
-            as: 'author',
-          }
-        },
-        { $unwind: '$author' },
         { $sort: { createdAt: -1 } },
         { $skip: calculatedOffset },
         { $limit: calculatedLimit },

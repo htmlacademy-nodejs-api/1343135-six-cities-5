@@ -16,5 +16,5 @@ export class CreateOfferDto {
   public price: number;
   public features: FeatureValue[];
   public location: Location;
-  public author: string;
+  public authorId: string;
 }

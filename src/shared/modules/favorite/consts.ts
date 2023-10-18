@@ -1,2 +1,4 @@
-export const DEFAULT_OFFSET = 0;
-export const DEFAULT_LIMIT = 60;
+export const DefaultPaginationParams = {
+  offset: 0,
+  limit: 60,
+} as const;

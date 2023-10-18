@@ -74,7 +74,7 @@ export class ImportCommand implements Command {
       fileReader.on('line', async (line: string, resolve: () => void) => {
         const offer = TSVOfferParser.parse(line);
         const user = await this.findOrCreateUser(offer.author);
-        await this.createOffer({ ...offer, author: user.id });
+        await this.createOffer({ ...offer, authorId: user.id });
         resolve();
       });
 

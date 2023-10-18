@@ -8,7 +8,7 @@ import { Logger } from '../../lib/logger/index.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CityValue } from '../../types/city.enum.js';
 import { Pagination } from '../../types/pagination.js';
-import { DEFAULT_LIMIT, DEFAULT_LIMIT_PREMIUM, DEFAULT_OFFSET, RATING_PRESICION } from './consts.js';
+import { DefaultPaginationParams, RATING_PRESICION } from './consts.js';
 import { AddCommentDto } from './dto/add-comment.dto.js';
 import { floatToPrecision } from '../../utils/number.js';
 
@@ -20,7 +20,9 @@ export class DefaultOfferService implements OfferService {
   ) {}
 
   public async create(dto: CreateOfferDto) {
-    const offer = (await this.offerModel.create(dto)).populate('author');
+    const offer = (
+      await this.offerModel.create({...dto, author: dto.authorId })
+    ).populate('author');
 
     return offer;
   }
@@ -51,8 +53,8 @@ export class DefaultOfferService implements OfferService {
   }
 
   public find(pagination?: Pagination) {
-    const calculatedOffset = pagination?.offset ?? DEFAULT_OFFSET;
-    const calculatedLimit = pagination?.limit ?? DEFAULT_LIMIT;
+    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
+    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
 
     return this.offerModel
       .find()
@@ -62,8 +64,10 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async findPremiumByCity(city: CityValue, pagination?: Pagination) {
-    const calculatedOffset = pagination?.offset ?? DEFAULT_OFFSET;
-    const calculatedLimit = pagination?.limit !== undefined ? Math.min(pagination.limit, DEFAULT_LIMIT_PREMIUM) : DEFAULT_LIMIT_PREMIUM;
+    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
+    const calculatedLimit = pagination?.limit !== undefined
+      ? Math.min(pagination.limit, DefaultPaginationParams.limitPremium)
+      : DefaultPaginationParams.limitPremium;
 
     return this.offerModel
       .find({ city, isPremium: true })
