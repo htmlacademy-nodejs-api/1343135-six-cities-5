@@ -18,12 +18,6 @@ export class RestApplication {
     this.server = express();
   }
 
-  private async initServer() {
-    return new Promise<void>((resolve) => {
-      this.server.listen(this.config.get('PORT'), resolve);
-    });
-  }
-
   private async initDb() {
     await this.databaseClient.connect(getMongoUrl({
       username: this.config.get('DB_USERNAME'),
@@ -34,10 +28,24 @@ export class RestApplication {
     }));
   }
 
+  private initMiddleware() {
+    this.server.use(express.json());
+  }
+
+  private async initServer() {
+    return new Promise<void>((resolve) => {
+      this.server.listen(this.config.get('PORT'), resolve);
+    });
+  }
+
   public async init() {
     this.logger.info('Init database');
     await this.initDb();
     this.logger.info('Init database completed');
+
+    this.logger.info('Init app level middlewares');
+    this.initMiddleware();
+    this.logger.info('Init app level middlewares completed');
 
     this.logger.info('Init server');
     await this.initServer();
