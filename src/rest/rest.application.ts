@@ -5,6 +5,7 @@ import { Logger } from '../shared/lib/logger/logger.interface.js';
 import { Component } from '../shared/types/component.enum.js';
 import { DatabaseClient } from '../shared/lib/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
+import { ExceptionFilter } from '../shared/lib/rest/exception-filter/exception-filter.interface.js';
 
 @injectable()
 export class RestApplication {
@@ -13,7 +14,8 @@ export class RestApplication {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.Config) private readonly config: Config<RestConfigSchema>,
-    @inject(Component.DatabaseClient) private readonly databaseClient: DatabaseClient
+    @inject(Component.DatabaseClient) private readonly databaseClient: DatabaseClient,
+    @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter
   ) {
     this.server = express();
   }
@@ -32,6 +34,10 @@ export class RestApplication {
     this.server.use(express.json());
   }
 
+  private initExceptionFilter() {
+    this.server.use(this.appExceptionFilter.catch.bind(this.appExceptionFilter));
+  }
+
   private async initServer() {
     return new Promise<void>((resolve) => {
       this.server.listen(this.config.get('PORT'), resolve);
@@ -41,11 +47,15 @@ export class RestApplication {
   public async init() {
     this.logger.info('Init database');
     await this.initDb();
-    this.logger.info('Init database completed');
+    this.logger.info('Database initialized');
 
     this.logger.info('Init app level middlewares');
     this.initMiddleware();
-    this.logger.info('Init app level middlewares completed');
+    this.logger.info('App level middlewares initialized');
+
+    this.logger.info('Init app exception filter');
+    this.initExceptionFilter();
+    this.logger.info('App exception filter initialized');
 
     this.logger.info('Init server');
     await this.initServer();
