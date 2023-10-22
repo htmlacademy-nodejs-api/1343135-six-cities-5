@@ -27,23 +27,6 @@ paths:
       parameters:
         - $ref: '#components/parameters/limit'
         - $ref: '#components/parameters/offset'
-        - name: isPremium
-          in: query
-          description: is premium offer
-          schema:
-            type: string
-            example: true
-        - name: isFavorite
-          in: query
-          description: offer is added to favorites
-          schema:
-            type: boolean
-            example: true
-        - name: city
-          in: query
-          description: name of the city
-          schema:
-            $ref: '#/components/schemas/city'
 
       responses:
         "200":
@@ -53,7 +36,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/offerRdo'
+                  $ref: '#/components/schemas/offerShortRdo'
 
     post:
       tags:
@@ -512,6 +495,55 @@ components:
           example:
             - 48.85661
             - 2.351499
+
+    offerShortRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6522aa1decfcf1bc655a253d
+
+        title:
+          type: string
+          example: Cozy flat in the city center
+
+        createdAt:
+          type: string
+          example: '2023-09-23T08:40:51.065Z'
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        preview:
+          type: string
+          example: https://picsum.photos/200
+
+        isPremium:
+          type: boolean
+          example: true
+
+        isFavorite:
+          type: boolean
+          example: false
+
+        rating:
+          type: number
+          example: 4.5
+
+        housingType:
+          $ref: '#/components/schemas/housingType'
+
+        price:
+          type: integer
+          format: int32
+          example: 10000
+
+        commentCount:
+          type: integer
+          format: int32
+          example: 23
+
 
     offerRdo:
       type: object

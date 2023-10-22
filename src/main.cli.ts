@@ -23,7 +23,7 @@ function bootstrap() {
       new RestConfig(logger),
       new MongoDatabaseClient(logger),
       new DefaultUserService(logger, UserModel),
-      new DefaultOfferService(logger, OfferModel),
+      new DefaultOfferService(OfferModel),
     ),
     new GenerateCommand(),
   ]);

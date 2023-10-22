@@ -6,6 +6,7 @@ import { Component } from '../shared/types/component.enum.js';
 import { DatabaseClient } from '../shared/lib/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 import { ExceptionFilter } from '../shared/lib/rest/exception-filter/exception-filter.interface.js';
+import { Controller } from '../shared/lib/rest/controller/index.js';
 
 @injectable()
 export class RestApplication {
@@ -15,7 +16,8 @@ export class RestApplication {
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.Config) private readonly config: Config<RestConfigSchema>,
     @inject(Component.DatabaseClient) private readonly databaseClient: DatabaseClient,
-    @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter
+    @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter,
+    @inject(Component.OfferController) private readonly offerController: Controller
   ) {
     this.server = express();
   }
@@ -32,6 +34,10 @@ export class RestApplication {
 
   private initMiddleware() {
     this.server.use(express.json());
+  }
+
+  private initControllers() {
+    this.server.use('/offers', this.offerController.router);
   }
 
   private initExceptionFilter() {
@@ -52,6 +58,10 @@ export class RestApplication {
     this.logger.info('Init app level middlewares');
     this.initMiddleware();
     this.logger.info('App level middlewares initialized');
+
+    this.logger.info('Init controllers');
+    this.initControllers();
+    this.logger.info('Controllers initialized');
 
     this.logger.info('Init app exception filter');
     this.initExceptionFilter();
