@@ -1,9 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { CityValue } from '../../../types/city.enum.js';
 import { HousingTypeValue } from '../../../types/housing-type.enum.js';
 
 export class OfferShortRdo {
   @Expose()
+  @Transform((value) => value.obj._id)
   public id: string;
 
   @Expose()
