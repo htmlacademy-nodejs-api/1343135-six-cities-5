@@ -33,9 +33,8 @@ export class OfferController extends BaseController {
   }
 
   private async index(req: Request, res: Response) {
-    const { limit, offset } = req.query;
     const offers = await this.offerService.find(
-      fillParams(Pagination, { limit, offset })
+      fillParams(Pagination, req.query)
     );
 
     this.ok(res, fillDto(OfferShortRdo, offers));
@@ -68,8 +67,10 @@ export class OfferController extends BaseController {
       throw new HttpError(404, 'Not found');
     }
 
-    const relevantPayload = fillParams(UpdateOfferDto, req.body);
-    const updatedOffer = await this.offerService.update(req.params.id, relevantPayload);
+    const updatedOffer = await this.offerService.update(
+      req.params.id,
+      fillParams(UpdateOfferDto, req.body)
+    );
 
     this.ok(res, fillDto(OfferRdo, updatedOffer));
   }
@@ -95,9 +96,10 @@ export class OfferController extends BaseController {
       throw new HttpError(400, 'Bad request', 'City should be specified');
     }
 
-    const { limit, offset } = req.query;
-    const pagination = fillParams(Pagination, { limit, offset });
-    const offers = await this.offerService.findPremiumForCity(req.params.city, pagination);
+    const offers = await this.offerService.findPremiumForCity(
+      req.params.city,
+      fillParams(Pagination, req.query)
+    );
 
     this.ok(res, fillDto(OfferShortRdo, offers));
   }

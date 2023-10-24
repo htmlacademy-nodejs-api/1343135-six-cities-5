@@ -36,8 +36,10 @@ export class FavoriteController extends BaseController {
       throw new HttpError(StatusCodes.UNAUTHORIZED, 'Not authorized');
     }
 
-    const pagination = fillParams(Pagination, { limit, offset });
-    const favoriteList = await this.favoriteService.findByUserId(userId, pagination);
+    const favoriteList = await this.favoriteService.findByUserId(
+      userId,
+      fillParams(Pagination, { limit, offset })
+    );
 
     this.ok(res, fillDto(OfferShortRdo, favoriteList));
   }
