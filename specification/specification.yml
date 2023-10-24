@@ -164,7 +164,16 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/{id}/comments:
+  /comments/{offerId}:
+    parameters:
+      - name: offerId
+        in: path
+        description: Id of the offer
+        required: true
+        schema:
+          type: string
+          example: 6522aa1decfcf1bc655a2538
+
     get:
       tags:
         - comments
@@ -184,8 +193,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/commentRdo'
 
-        "404":
-          description: Offer with specified {id} not found
+        "400":
+          description: Invalid request params
 
     post:
       tags:

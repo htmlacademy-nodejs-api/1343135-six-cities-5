@@ -3,17 +3,17 @@ import { UserTypeValue } from '../../../types/user-type.enum.js';
 
 export class UserRdo {
   @Expose()
-    id: string;
+  public id: string;
 
   @Expose()
-    name: string;
+  public name: string;
 
   @Expose()
-    email: string;
+  public email: string;
 
   @Expose()
-    type: UserTypeValue;
+  public type: UserTypeValue;
 
   @Expose()
-    avatar?: string;
+  public avatar?: string;
 }

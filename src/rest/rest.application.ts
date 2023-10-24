@@ -19,7 +19,8 @@ export class RestApplication {
     @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter,
     @inject(Component.OfferController) private readonly offerController: Controller,
     @inject(Component.UserController) private readonly userController: Controller,
-    @inject(Component.FavoriteController) private readonly favoriteController: Controller
+    @inject(Component.FavoriteController) private readonly favoriteController: Controller,
+    @inject(Component.CommentController) private readonly commentController: Controller
   ) {
     this.server = express();
   }
@@ -42,6 +43,7 @@ export class RestApplication {
     this.server.use('/offers/favorite', this.favoriteController.router);
     this.server.use('/offers', this.offerController.router);
     this.server.use('/users', this.userController.router);
+    this.server.use('/comments', this.commentController.router);
   }
 
   private initExceptionFilter() {

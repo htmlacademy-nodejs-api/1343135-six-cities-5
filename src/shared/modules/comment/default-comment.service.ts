@@ -17,27 +17,25 @@ export class DefaultCommentService implements CommentService {
     const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
     const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
 
-    return this.commentModel
+    const comments = await this.commentModel
       .find({ offer: id })
       .sort({ createdAt: -1 })
       .skip(calculatedOffset)
-      .limit(calculatedLimit);
+      .limit(calculatedLimit)
+      .populate('author');
+
+    return comments;
   }
 
   public async create(dto: CreateCommentDto) {
-    const comment = await this.commentModel.create({
+    const comment = (await this.commentModel.create({
       ...dto,
       offer: dto.offerId,
       author: dto.authorId,
-    });
+    })).populate('author');
 
     await this.offerService.addComment({ offerId: dto.offerId, rating: dto.rating });
 
     return comment;
-  }
-
-  public async deleteByOfferId(offerId: string) {
-    const deleteResult = await this.commentModel.deleteMany({ offer: offerId });
-    return deleteResult.deletedCount;
   }
 }
