@@ -1,5 +1,4 @@
 import { injectable, inject } from 'inversify';
-import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/base-controller.abstract.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/logger.interface.js';
@@ -7,10 +6,10 @@ import { Response } from 'express';
 import { HttpMethod } from '../../lib/rest/types/http-method.enum.js';
 import { CreateCommentRequest, IndexCommentRequest } from './types.js';
 import { CommentService } from './comment-service.interface.js';
-import { HttpError } from '../../lib/rest/errors/http-error.js';
 import { fillDto, fillParams } from '../../utils/common.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { Pagination } from '../../types/pagination.js';
+import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 
 @injectable()
 export class CommentController extends BaseController {
@@ -20,15 +19,21 @@ export class CommentController extends BaseController {
   ) {
     super(logger);
 
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/:offerId',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+    });
+    this.addRoute({
+      path: '/:offerId',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+    });
   }
 
   private async index(req: IndexCommentRequest, res: Response) {
-    if (!req.params.offerId) {
-      throw new HttpError(StatusCodes.BAD_REQUEST, 'Bad request');
-    }
-
     const comments = await this.commentService.findByOfferId(
       req.params.offerId,
       fillParams(Pagination, req.query)
@@ -38,9 +43,6 @@ export class CommentController extends BaseController {
   }
 
   private async create(req: CreateCommentRequest, res: Response) {
-    if (!req.params.offerId) {
-      throw new HttpError(StatusCodes.BAD_REQUEST, 'Bad request');
-    }
     const comment = await this.commentService.create({...req.body, offerId: req.params.offerId });
 
     this.created(res, fillDto(CommentRdo, comment));

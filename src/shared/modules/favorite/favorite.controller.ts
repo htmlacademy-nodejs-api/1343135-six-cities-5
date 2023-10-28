@@ -12,6 +12,7 @@ import { CreateFavoriteRequest, DeleteFavoriteRequest, IndexFavoriteRequest } fr
 import { OfferShortRdo } from '../offer/index.js';
 import { HttpError } from '../../lib/rest/errors/http-error.js';
 import { CreateFavoriteRdo } from './rdo/CreateFavoriteRdo.js';
+import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 
 @injectable()
 export class FavoriteController extends BaseController {
@@ -26,7 +27,15 @@ export class FavoriteController extends BaseController {
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/:offerId/:userId', method: HttpMethod.Delete, handler: this.delete });
+    this.addRoute({
+      path: '/:offerId/:userId',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateObjectIdMiddleware('userId'),
+      ]
+    });
   }
 
   private async index(req: IndexFavoriteRequest, res: Response) {
@@ -52,10 +61,6 @@ export class FavoriteController extends BaseController {
 
   private async delete(req: DeleteFavoriteRequest, res: Response) {
     const { offerId, userId } = req.params;
-
-    if (!offerId || !userId) {
-      throw new HttpError(StatusCodes.BAD_REQUEST, 'Invalid params');
-    }
 
     await this.favoriteService.delete({ offerId, userId });
     this.noContent(res);

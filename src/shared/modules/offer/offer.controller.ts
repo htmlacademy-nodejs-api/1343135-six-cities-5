@@ -1,5 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/index.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/index.js';
@@ -10,7 +11,7 @@ import { fillDto, fillParams } from '../../utils/common.js';
 import { OfferShortRdo } from './rdo/offer-short.rdo.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
-import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, UpdateOfferRequest } from './types.js';
+import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './types.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 
 @injectable()
@@ -46,25 +47,21 @@ export class OfferController extends BaseController {
     return this.created(res, fillDto(OfferRdo, offer));
   }
 
-  private async show(req: Request, res: Response) {
+  private async show(req: ShowOfferRequest, res: Response) {
     const offer = await this.offerService.findById(req.params.id);
 
     if (offer) {
       return this.ok(res, fillDto(OfferRdo, offer));
     }
 
-    throw new HttpError(404, 'Not found');
+    throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
   }
 
   private async update(req: UpdateOfferRequest, res: Response) {
-    if (!req.params.id) {
-      throw new HttpError(400, 'Bad Request', 'OfferId should be defined');
-    }
-
     const offerExists = await this.offerService.exists(req.params.id);
 
     if (!offerExists) {
-      throw new HttpError(404, 'Not found');
+      throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
     }
 
     const updatedOffer = await this.offerService.update(
@@ -76,14 +73,10 @@ export class OfferController extends BaseController {
   }
 
   private async delete(req: DeleteOfferRequest, res: Response) {
-    if (!req.params.id) {
-      throw new HttpError(400, 'Bad Request', 'OfferId should be defined');
-    }
-
     const offerExists = await this.offerService.exists(req.params.id);
 
     if (!offerExists) {
-      throw new HttpError(404, 'Not found');
+      throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
     }
 
     await this.offerService.delete(req.params.id);
@@ -93,7 +86,11 @@ export class OfferController extends BaseController {
 
   private async premiumForCity(req: PremiumForCityRequest, res: Response) {
     if (!req.params.city) {
-      throw new HttpError(400, 'Bad request', 'City should be specified');
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        'Bad request',
+        'City should be specified',
+      );
     }
 
     const offers = await this.offerService.findPremiumForCity(

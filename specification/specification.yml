@@ -93,6 +93,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/offerRdo'
+
+        "400":
+          description: Invalid request params
+
         "404":
           description: Offer not found
 
@@ -161,6 +165,9 @@ paths:
         "204":
           description: Offer is deleted
 
+        "400":
+          description: Invalid request params
+
         "401":
           $ref: '#/components/responses/401'
 
@@ -222,7 +229,7 @@ paths:
                 $ref: '#/components/schemas/commentRdo'
 
         "400":
-          description: Invalid comment data is provided
+          description: Invalid request params
 
         "401":
           $ref: '#/components/responses/401'
