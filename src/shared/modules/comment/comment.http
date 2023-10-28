@@ -1,0 +1,15 @@
+# Comments
+## Get comments for the offer
+GET http://localhost:3000/comments/652be4d978399a7fa78c098f?limit=2&offset=3 HTTP/1.1
+
+###
+
+## Create comment for the offer
+POST http://localhost:3000/comments/652be4d978399a7fa78c098f HTTP/1.1
+Content-Type: application/json
+
+{
+  "text": "Must try this one, at least once in a lifetime!",
+  "rating": 5,
+  "authorId": "652be4d978399a7fa78c099c"
+}

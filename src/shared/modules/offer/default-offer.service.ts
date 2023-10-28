@@ -1,10 +1,9 @@
 import { inject, injectable } from 'inversify';
-import { types } from '@typegoose/typegoose';
+import { types, DocumentType } from '@typegoose/typegoose';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { OfferService } from './offer-service.interface.js';
 import { OfferEntity } from './offer.entity.js';
 import { Component } from '../../types/component.enum.js';
-import { Logger } from '../../lib/logger/index.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CityValue } from '../../types/city.enum.js';
 import { Pagination } from '../../types/pagination.js';
@@ -15,7 +14,6 @@ import { floatToPrecision } from '../../utils/number.js';
 @injectable()
 export class DefaultOfferService implements OfferService {
   constructor(
-    @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
   ) {}
 
@@ -28,33 +26,30 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async findById(id: string) {
-    try {
-      return await this.offerModel.findById(id).populate('author');
-    } catch {
-      return null;
-    }
+    return await this.offerModel.findById(id).populate('author');
   }
 
   public async update(id: OfferEntity['id'], dto: UpdateOfferDto) {
-    const offer = await this.findById(id);
+    return await this.offerModel
+      .findByIdAndUpdate(id, dto, { new: true })
+      .populate('author') as DocumentType<OfferEntity>;
+  }
 
-    if (!offer) {
-      this.logger.info(`Not found offer to update. ID: ${id}`);
-      throw new Error('Not found offer to update');
-    }
-
-    await offer.updateOne(dto).populate('author');
-
-    return offer;
+  public async exists(id: OfferEntity['id']) {
+    return await this.findById(id) !== null;
   }
 
   public async delete(id: OfferEntity['id']) {
-    this.offerModel.findByIdAndRemove(id);
+    await this.offerModel.findByIdAndRemove(id);
   }
 
-  public find(pagination?: Pagination) {
+  public async find(pagination?: Pagination) {
     const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
     const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
+
+    if (calculatedLimit === 0) {
+      return [];
+    }
 
     return this.offerModel
       .find()
@@ -63,11 +58,13 @@ export class DefaultOfferService implements OfferService {
       .limit(calculatedLimit);
   }
 
-  public async findPremiumByCity(city: CityValue, pagination?: Pagination) {
+  public async findPremiumForCity(city: CityValue, pagination?: Pagination) {
     const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
-    const calculatedLimit = pagination?.limit !== undefined
-      ? Math.min(pagination.limit, DefaultPaginationParams.limitPremium)
-      : DefaultPaginationParams.limitPremium;
+    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limitPremium;
+
+    if (calculatedLimit === 0) {
+      return [];
+    }
 
     return this.offerModel
       .find({ city, isPremium: true })

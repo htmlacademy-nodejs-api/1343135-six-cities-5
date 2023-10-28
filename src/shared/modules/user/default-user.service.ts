@@ -50,12 +50,12 @@ export class DefaultUserService implements UserService {
     const user = await this.findByEmail(dto.email);
 
     if (!user) {
-      throw new Error(`User with email ${dto.email} not found`);
+      return false;
     }
 
     const isCorrectPassword = user.checkPassword(dto.password, salt);
 
     // TODO: token
-    return isCorrectPassword ? 'success' : 'fail';
+    return isCorrectPassword;
   }
 }

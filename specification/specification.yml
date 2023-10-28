@@ -6,6 +6,8 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
   version: 1.0.0
+servers:
+  - url: http://localhost:3000
 
 tags:
   - name: offers
@@ -27,23 +29,6 @@ paths:
       parameters:
         - $ref: '#components/parameters/limit'
         - $ref: '#components/parameters/offset'
-        - name: isPremium
-          in: query
-          description: is premium offer
-          schema:
-            type: string
-            example: true
-        - name: isFavorite
-          in: query
-          description: offer is added to favorites
-          schema:
-            type: boolean
-            example: true
-        - name: city
-          in: query
-          description: name of the city
-          schema:
-            $ref: '#/components/schemas/city'
 
       responses:
         "200":
@@ -53,7 +38,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/offerRdo'
+                  $ref: '#/components/schemas/offerShortRdo'
 
     post:
       tags:
@@ -179,7 +164,16 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/{id}/comments:
+  /comments/{offerId}:
+    parameters:
+      - name: offerId
+        in: path
+        description: Id of the offer
+        required: true
+        schema:
+          type: string
+          example: 6522aa1decfcf1bc655a2538
+
     get:
       tags:
         - comments
@@ -199,8 +193,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/commentRdo'
 
-        "404":
-          description: Offer with specified {id} not found
+        "400":
+          description: Invalid request params
 
     post:
       tags:
@@ -246,6 +240,11 @@ paths:
       parameters:
         - $ref: '#components/parameters/limit'
         - $ref: '#components/parameters/offset'
+        # TODO: remove after authorization is ready
+        - name: userId
+          in: query
+          schema:
+            type: string
 
       responses:
         "200":
@@ -274,8 +273,17 @@ paths:
         content:
           application/json:
             schema:
-              type: string
-              example: 6522aa1decfcf1bc655a2547
+              # TODO: fix after authorization is ready
+              type: object
+
+              properties:
+                offerId:
+                  type: string
+                  example: 6522aa1decfcf1bc655a2547
+
+                userId:
+                  type: string
+                  example: 652be40f1dc314f63108b51b
 
         required: true
 
@@ -309,12 +317,24 @@ paths:
           description: Id of the favorite offer
           required: true
           schema:
-            type: string
-            example: 6522aa1decfcf1bc655a2538
+            type: object
+
+            # TODO: fix after authorization is ready
+            properties:
+              offerId:
+                type: string
+                example: 6522aa1decfcf1bc655a2547
+
+              userId:
+                type: string
+                example: 652be40f1dc314f63108b51b
 
       responses:
         "204":
-          description: Offers are deleted form favorite
+          description: Offer is deleted from favorite
+
+        "400":
+          description: Invalid params
 
         "401":
           $ref: '#/components/responses/401'
@@ -512,6 +532,55 @@ components:
           example:
             - 48.85661
             - 2.351499
+
+    offerShortRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6522aa1decfcf1bc655a253d
+
+        title:
+          type: string
+          example: Cozy flat in the city center
+
+        createdAt:
+          type: string
+          example: '2023-09-23T08:40:51.065Z'
+
+        city:
+          $ref: '#/components/schemas/city'
+
+        preview:
+          type: string
+          example: https://picsum.photos/200
+
+        isPremium:
+          type: boolean
+          example: true
+
+        isFavorite:
+          type: boolean
+          example: false
+
+        rating:
+          type: number
+          example: 4.5
+
+        housingType:
+          $ref: '#/components/schemas/housingType'
+
+        price:
+          type: integer
+          format: int32
+          example: 10000
+
+        commentCount:
+          type: integer
+          format: int32
+          example: 23
+
 
     offerRdo:
       type: object

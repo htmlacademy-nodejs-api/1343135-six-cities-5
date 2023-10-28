@@ -5,3 +5,6 @@ export * from './offer.entity.js';
 export * from './dto/create-offer.dto.js';
 export * from './dto/update-offer.dto.js';
 export * from './dto/add-comment.dto.js';
+export * from './offer.controller.js';
+export * from './rdo/offer-short.rdo.js';
+export * from './rdo/offer.rdo.js';
