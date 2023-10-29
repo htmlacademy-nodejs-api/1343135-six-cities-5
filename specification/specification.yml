@@ -171,38 +171,7 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /comments/{offerId}:
-    parameters:
-      - name: offerId
-        in: path
-        description: Id of the offer
-        required: true
-        schema:
-          type: string
-          example: 6522aa1decfcf1bc655a2538
-
-    get:
-      tags:
-        - comments
-      summary: Get comment list
-      description: Get the list of comments for specified offer
-      parameters:
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
-
-      responses:
-        "200":
-          description: List of comments for specified offer
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/commentRdo'
-
-        "400":
-          description: Invalid request params
-
+  /comments:
     post:
       tags:
         - comments
@@ -234,6 +203,37 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
+
+  /comments/{offerId}:
+    get:
+      tags:
+        - comments
+      summary: Get comment list
+      description: Get the list of comments for specified offer
+      parameters:
+        - name: offerId
+          in: path
+          description: Id of the offer
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2538
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+
+      responses:
+        "200":
+          description: List of comments for specified offer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/commentRdo'
+
+        "400":
+          description: Invalid request params
+
   /offers/favorite:
     get:
       tags:
@@ -252,6 +252,7 @@ paths:
           in: query
           schema:
             type: string
+            example: 652be40f1dc314f63108b51b
 
       responses:
         "200":
@@ -775,13 +776,22 @@ components:
     commentDto:
       type: object
 
-      required:
-        - text
-
       properties:
         text:
           type: string
           example: Great place, surely will stay here again when I'm in Amsterdam!
+
+        rating:
+          type: number
+          example: 4.9
+
+        offerId:
+          type: string
+          example: 6522aa1decfcf1bc655a2538
+
+        authorId:
+          type: string
+          example: 652be40f1dc314f63108b51b
 
     commentRdo:
       type: object

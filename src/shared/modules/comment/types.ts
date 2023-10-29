@@ -6,4 +6,4 @@ import { CommentRdo } from './rdo/comment.rdo.js';
 import { CreateCommentDto } from './index.js';
 
 export type IndexCommentRequest = Request<{ offerId: string } | ParamsDictionary, CommentRdo, RequestBody, Pagination>
-export type CreateCommentRequest = Request<{ offerId: string } | ParamsDictionary, CommentRdo, Omit<CreateCommentDto, 'offerId'>>
+export type CreateCommentRequest = Request<ParamsDictionary, CommentRdo, CreateCommentDto>
