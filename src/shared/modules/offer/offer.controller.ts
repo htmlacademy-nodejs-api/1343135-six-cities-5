@@ -16,6 +16,7 @@ import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { CreateOfferDto } from './index.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
+import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -43,6 +44,7 @@ export class OfferController extends BaseController {
       handler: this.show,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id'),
       ]
     });
     this.addRoute({
@@ -51,7 +53,8 @@ export class OfferController extends BaseController {
       handler: this.update,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
-        new ValidateDtoMiddleware(UpdateOfferDto)
+        new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id'),
       ]
     });
     this.addRoute({
@@ -60,6 +63,7 @@ export class OfferController extends BaseController {
       handler: this.delete,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'id'),
       ]
     });
     this.addRoute({ path: '/premium/:city', method: HttpMethod.Get, handler: this.premiumForCity });
@@ -82,20 +86,10 @@ export class OfferController extends BaseController {
   private async show(req: ShowOfferRequest, res: Response) {
     const offer = await this.offerService.findById(req.params.id);
 
-    if (offer) {
-      return this.ok(res, fillDto(OfferRdo, offer));
-    }
-
-    throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
+    return this.ok(res, fillDto(OfferRdo, offer));
   }
 
   private async update(req: UpdateOfferRequest, res: Response) {
-    const offerExists = await this.offerService.exists(req.params.id);
-
-    if (!offerExists) {
-      throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
-    }
-
     const updatedOffer = await this.offerService.update(
       req.params.id,
       fillParams(UpdateOfferDto, req.body)
@@ -105,12 +99,6 @@ export class OfferController extends BaseController {
   }
 
   private async delete(req: DeleteOfferRequest, res: Response) {
-    const offerExists = await this.offerService.exists(req.params.id);
-
-    if (!offerExists) {
-      throw new HttpError(StatusCodes.NOT_FOUND, 'Not found');
-    }
-
     await this.offerService.delete(req.params.id);
 
     this.noContent(res);
@@ -119,7 +107,7 @@ export class OfferController extends BaseController {
   private async premiumForCity(req: PremiumForCityRequest, res: Response) {
     if (!req.params.city) {
       throw new HttpError(
-        StatusCodes.NOT_FOUND,
+        StatusCodes.BAD_REQUEST,
         'Bad request',
         'City should be specified',
       );

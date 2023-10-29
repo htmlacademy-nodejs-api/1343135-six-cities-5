@@ -10,14 +10,16 @@ import { fillDto, fillParams } from '../../utils/common.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { Pagination } from '../../types/pagination.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
-import { ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
+import { DocumentExistsMiddleware, ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
 import { CreateCommentDto } from './index.js';
+import { OfferService } from '../offer/index.js';
 
 @injectable()
 export class CommentController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
-    @inject(Component.CommentService) private readonly commentService: CommentService
+    @inject(Component.CommentService) private readonly commentService: CommentService,
+    @inject(Component.OfferService) private readonly offerService: OfferService
   ) {
     super(logger);
 
@@ -33,7 +35,10 @@ export class CommentController extends BaseController {
       path: '/:offerId',
       method: HttpMethod.Get,
       handler: this.show,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
+      ]
     });
   }
 

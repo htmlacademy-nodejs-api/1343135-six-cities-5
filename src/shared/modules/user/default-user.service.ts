@@ -25,11 +25,11 @@ export class DefaultUserService implements UserService {
   }
 
   public async findById(id: string) {
-    try {
-      return await this.userModel.findById(id);
-    } catch {
-      return null;
-    }
+    return this.userModel.findById(id);
+  }
+
+  public async exists(id: string) {
+    return Boolean(await this.findById(id));
   }
 
   public async findByEmail(email: string) {

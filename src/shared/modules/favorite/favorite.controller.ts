@@ -13,13 +13,15 @@ import { CreateFavoriteRdo } from './rdo/CreateFavoriteRdo.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { CreateFavoriteDto, DeleteFavoriteDto } from './index.js';
+import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
+import { UserService } from '../user/index.js';
 
 @injectable()
 export class FavoriteController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
-    @inject(Component.FavoriteService) protected readonly favoriteService: FavoriteService
-
+    @inject(Component.FavoriteService) private readonly favoriteService: FavoriteService,
+    @inject(Component.UserService) private readonly userService: UserService
   ) {
     super(logger);
 
@@ -31,6 +33,7 @@ export class FavoriteController extends BaseController {
       handler: this.index,
       middlewares: [
         new ValidateObjectIdMiddleware('userId'),
+        new DocumentExistsMiddleware(this.userService, 'User', 'userId')
       ] });
     this.addRoute({
       path: '/',
