@@ -705,7 +705,7 @@ components:
 
         avatar:
           type: string
-          example: http://my_avatar.uk/felix.jpg
+          example: http://my-avatar.uk/felix.jpg
 
 
     userRdo:

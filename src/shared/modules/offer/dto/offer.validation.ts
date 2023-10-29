@@ -2,7 +2,7 @@ import { City } from '../../../types/city.enum.js';
 import { HousingType } from '../../../types/housing-type.enum.js';
 import { Feature } from '../../../types/feature.enum.js';
 
-export const CreateOfferValidation = {
+export const OfferValidation = {
   title: {
     rule: {
       minLength: 10,

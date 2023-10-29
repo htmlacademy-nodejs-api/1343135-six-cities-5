@@ -2,7 +2,7 @@ import { IsString, Length, IsOptional, IsEnum, Validate } from 'class-validator'
 import { BaseUserDto } from './base-user.dto.js';
 import { UserValidation as validation } from './user.validation.js';
 import { UserType, UserTypeValue } from '../../../types/user-type.enum.js';
-import { Avatar } from './avatar.dto.js';
+import { FileUrlValidator } from '../../../utils/validation.js';
 
 export class CreateUserDto extends BaseUserDto {
   @IsString({ message: validation.name.message.format })
@@ -18,6 +18,9 @@ export class CreateUserDto extends BaseUserDto {
   public type: UserTypeValue;
 
   @IsOptional()
-  @Validate(Avatar, { message: validation.avatar.message.value })
+  @Validate(
+    FileUrlValidator(validation.avatar.formats),
+    { message: validation.avatar.message.value },
+  )
   public avatar?: string;
 }

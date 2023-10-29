@@ -5,9 +5,10 @@ Content-Type: application/json
 
 {
   "name": "Pavel Mareev",
-  "email": "mareev.p@gmail.com",
+  "email": "mareev4@gmail.com",
   "type": "default",
-  "password": "secret_01234"
+  "password": "secret_01234",
+  "avatar": "my-avatard.uk/felix.jpg"
 }
 
 ###
