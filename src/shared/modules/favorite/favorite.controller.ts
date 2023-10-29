@@ -1,6 +1,5 @@
 import { injectable, inject } from 'inversify';
 import { Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/index.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/index.js';
@@ -10,9 +9,10 @@ import { fillDto, fillParams } from '../../utils/common.js';
 import { FavoriteService } from './favorite-service.interface.js';
 import { CreateFavoriteRequest, DeleteFavoriteRequest, IndexFavoriteRequest } from './types.js';
 import { OfferShortRdo } from '../offer/index.js';
-import { HttpError } from '../../lib/rest/errors/http-error.js';
 import { CreateFavoriteRdo } from './rdo/CreateFavoriteRdo.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
+import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
+import { CreateFavoriteDto, DeleteFavoriteDto } from './index.js';
 
 @injectable()
 export class FavoriteController extends BaseController {
@@ -25,29 +25,35 @@ export class FavoriteController extends BaseController {
 
     this.logger.info('Register routes for OfferController');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
     this.addRoute({
-      path: '/:offerId/:userId',
+      path: '/:userId',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [
+        new ValidateObjectIdMiddleware('userId'),
+      ] });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [
+        new ValidateDtoMiddleware(CreateFavoriteDto)
+      ],
+    });
+    this.addRoute({
+      path: '/',
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
-        new ValidateObjectIdMiddleware('offerId'),
-        new ValidateObjectIdMiddleware('userId'),
+        new ValidateDtoMiddleware(DeleteFavoriteDto)
       ]
     });
   }
 
   private async index(req: IndexFavoriteRequest, res: Response) {
-    const { limit, offset, userId } = req.query;
-
-    if (!userId || typeof userId !== 'string') {
-      throw new HttpError(StatusCodes.UNAUTHORIZED, 'Not authorized');
-    }
-
     const favoriteList = await this.favoriteService.findByUserId(
-      userId,
-      fillParams(Pagination, { limit, offset })
+      req.params.userId,
+      fillParams(Pagination, req.query)
     );
 
     this.ok(res, fillDto(OfferShortRdo, favoriteList));
@@ -56,13 +62,11 @@ export class FavoriteController extends BaseController {
   private async create(req: CreateFavoriteRequest, res: Response) {
     const favorite = await this.favoriteService.create(req.body);
 
-    this.ok(res, fillDto(CreateFavoriteRdo, favorite));
+    this.created(res, fillDto(CreateFavoriteRdo, favorite));
   }
 
   private async delete(req: DeleteFavoriteRequest, res: Response) {
-    const { offerId, userId } = req.params;
-
-    await this.favoriteService.delete({ offerId, userId });
+    await this.favoriteService.delete(req.body);
     this.noContent(res);
   }
 }

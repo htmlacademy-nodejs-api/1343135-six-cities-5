@@ -203,7 +203,6 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-
   /comments/{offerId}:
     get:
       tags:
@@ -235,49 +234,16 @@ paths:
           description: Invalid request params
 
   /offers/favorite:
-    get:
-      tags:
-        - favorite
-      summary: Get favorite offers
-      description: Get the list of user's favorite offers
-
-      security:
-        - BearerAuth: []
-
-      parameters:
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
-        # TODO: remove after authorization is ready
-        - name: userId
-          in: query
-          schema:
-            type: string
-            example: 652be40f1dc314f63108b51b
-
-      responses:
-        "200":
-          description: List of the favorite offers
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/offerRdo'
-
-        "401":
-          $ref: '#/components/responses/401'
-
     post:
       tags:
         - favorite
       summary: Add to favorite
-      description: Add offers to list of favorites by ids
+      description: Add offer to list of favorites by id
 
       security:
         - BearerAuth: []
 
       requestBody:
-        description: Offer id
         content:
           application/json:
             schema:
@@ -309,33 +275,32 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/favorite/{id}:
     delete:
       tags:
         - favorite
       summary: Delete from favorite
-      description: Delete offers form favorite by id
+      description: Delete offers from favorite by id
 
       security:
         - BearerAuth: []
 
-      parameters:
-        - name: id
-          in: path
-          description: Id of the favorite offer
-          required: true
-          schema:
-            type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              # TODO: fix after authorization is ready
+              type: object
 
-            # TODO: fix after authorization is ready
-            properties:
-              offerId:
-                type: string
-                example: 6522aa1decfcf1bc655a2547
+              properties:
+                offerId:
+                  type: string
+                  example: 6522aa1decfcf1bc655a2547
 
-              userId:
-                type: string
-                example: 652be40f1dc314f63108b51b
+                userId:
+                  type: string
+                  example: 652be40f1dc314f63108b51b
+
+        required: true
 
       responses:
         "204":
@@ -343,6 +308,41 @@ paths:
 
         "400":
           description: Invalid params
+
+        "401":
+          $ref: '#/components/responses/401'
+
+
+  /offers/favorite/{userId}:
+    get:
+      tags:
+        - favorite
+      summary: Get favorite offers
+      description: Get the list of user's favorite offers
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        # TODO: remove after authorization is ready
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+            example: 652be40f1dc314f63108b51b
+        - $ref: '#components/parameters/limit'
+        - $ref: '#components/parameters/offset'
+
+      responses:
+        "200":
+          description: List of the favorite offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerRdo'
 
         "401":
           $ref: '#/components/responses/401'
