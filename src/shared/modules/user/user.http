@@ -5,9 +5,9 @@ Content-Type: application/json
 
 {
   "name": "Pavel Mareev",
-  "email": "mareev.pv@gmail.com",
+  "email": "mareev.p@gmail.com",
   "type": "default",
-  "password": "secret_0123456"
+  "password": "secret_01234"
 }
 
 ###
@@ -17,6 +17,6 @@ POST http://localhost:3000/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "mareev.pv@gmail.com",
-  "password": "secret_0123456"
+  "email": "mareev.p@gmail.com",
+  "password": "secret_01234"
 }

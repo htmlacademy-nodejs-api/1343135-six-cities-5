@@ -7,7 +7,8 @@ import { getValidationError } from '../../../utils/common.js';
 
 export class ValidateDtoMiddleware implements Middleware {
   constructor(
-    private readonly dto: ClassConstructor<object>
+    private readonly dto: ClassConstructor<object>,
+    private readonly defaultErrorMessage?: string,
   ) {}
 
   async execute(req: Request, res: Response, next: NextFunction) {
@@ -17,7 +18,9 @@ export class ValidateDtoMiddleware implements Middleware {
     if (errors.length) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .send({ error: getValidationError(errors) });
+        .send({
+          error: this.defaultErrorMessage ? this.defaultErrorMessage : getValidationError(errors)
+        });
     }
 
     return next();

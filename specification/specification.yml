@@ -312,7 +312,6 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-
   /offers/favorite/{userId}:
     get:
       tags:
@@ -375,7 +374,6 @@ paths:
 
         "400":
           description: Invalid city name
-
 
   /users/signup:
     post:
