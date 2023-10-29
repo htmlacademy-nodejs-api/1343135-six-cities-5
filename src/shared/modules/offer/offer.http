@@ -31,7 +31,7 @@ Content-Type: application/json
   "housingType": "house",
   "roomCount": 3,
   "tenantCount": 2,
-  "price": 10000,
+  "price": 100,
   "features": [
     "Breakfast",
     "Air conditioning",
@@ -51,7 +51,7 @@ PATCH http://localhost:3000/offers/652be4d978399a7fa78c09b4 HTTP/1.1
 Content-Type: application/json
 
 {
-  "housingType": "apartment"
+  "housingType": "house"
 }
 
 ###

@@ -13,6 +13,9 @@ import { OfferRdo } from './rdo/offer.rdo.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
 import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './types.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
+import { CreateOfferDto } from './index.js';
+import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -26,10 +29,39 @@ export class OfferController extends BaseController {
     this.logger.info('Register routes for OfferController');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.show });
-    this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
-    this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [
+        new ValidateDtoMiddleware(CreateOfferDto)
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.show,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Patch,
+      handler: this.update,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new ValidateDtoMiddleware(UpdateOfferDto)
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+      ]
+    });
     this.addRoute({ path: '/premium/:city', method: HttpMethod.Get, handler: this.premiumForCity });
   }
 
