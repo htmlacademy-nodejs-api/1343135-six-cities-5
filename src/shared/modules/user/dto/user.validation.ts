@@ -34,7 +34,7 @@ export const UserValidation = {
     }
   },
   avatar: {
-    formats: ['.jpg', '.png'],
+    formats: ['.jpg', '.jpeg', '.png'],
     message: {
       format: 'avatar must be a string',
       value: 'avatar must be a valid url to .jpg or .png image',

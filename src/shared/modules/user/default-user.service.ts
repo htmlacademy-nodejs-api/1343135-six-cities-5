@@ -6,6 +6,7 @@ import { UserEntity } from './user.entity.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/index.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -57,5 +58,9 @@ export class DefaultUserService implements UserService {
 
     // TODO: token
     return isCorrectPassword;
+  }
+
+  public async update(id: UserEntity['id'], dto: UpdateUserDto) {
+    return this.userModel.findByIdAndUpdate(id, dto);
   }
 }
