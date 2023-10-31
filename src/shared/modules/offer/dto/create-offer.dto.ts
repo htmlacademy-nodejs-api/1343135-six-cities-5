@@ -1,20 +1,8 @@
-import { CityValue } from '../../../types/city.enum.js';
-import { FeatureValue } from '../../../types/feature.enum.js';
-import { HousingTypeValue } from '../../../types/housing-type.enum.js';
-import { Location } from '../../../types/location.type.js';
+import { IsMongoId } from 'class-validator';
+import { BaseOfferDto } from './base-offer.dto.js';
+import { OfferValidation as validation } from './offer.validation.js';
 
-export class CreateOfferDto {
-  public title: string;
-  public description: string;
-  public city: CityValue;
-  public preview: string;
-  public photos: string[];
-  public isPremium: boolean;
-  public housingType: HousingTypeValue;
-  public roomCount: number;
-  public tenantCount: number;
-  public price: number;
-  public features: FeatureValue[];
-  public location: Location;
+export class CreateOfferDto extends BaseOfferDto {
+  @IsMongoId({ message: validation.authorId.message.format })
   public authorId: string;
 }

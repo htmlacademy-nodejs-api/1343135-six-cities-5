@@ -1,16 +1,6 @@
 import { MockServerData } from '../../types/mock-server-data.type.js';
 import { getRandomBoolean, getRandomNumber, getRandomItem, getRandomChunk } from '../../utils/random.js';
-
-const PHOTO_COUNT = 6;
-
-const ROOM_COUNT_MIN = 1;
-const ROOM_COUNT_MAX = 8;
-
-const TENANT_COUNT_MIN = 1;
-const TENANT_COUNT_MAX = 10;
-
-const PRICE_MIN = 100;
-const PRICE_MAX = 100000;
+import { OfferValidation } from '../../modules/offer/dto/offer.validation.js';
 
 export class TSVOfferGenerator {
   static generate(serverMock: MockServerData) {
@@ -18,12 +8,24 @@ export class TSVOfferGenerator {
     const description = getRandomItem(serverMock.description);
     const city = getRandomItem(serverMock.city);
     const preview = getRandomItem(serverMock.preview);
-    const photos = getRandomChunk(serverMock.photos, PHOTO_COUNT).join(';');
+    const photos = getRandomChunk(
+      serverMock.photos,
+      OfferValidation.photos.rule.length,
+    ).join(';');
     const isPremium = getRandomBoolean();
     const housingType = getRandomItem(serverMock.housingType);
-    const roomCount = getRandomNumber(ROOM_COUNT_MIN, ROOM_COUNT_MAX);
-    const tenantCount = getRandomNumber(TENANT_COUNT_MIN, TENANT_COUNT_MAX);
-    const price = getRandomNumber(PRICE_MIN, PRICE_MAX);
+    const roomCount = getRandomNumber(
+      OfferValidation.roomCount.rule.min,
+      OfferValidation.roomCount.rule.max,
+    );
+    const tenantCount = getRandomNumber(
+      OfferValidation.tenantCount.rule.min,
+      OfferValidation.tenantCount.rule.max,
+    );
+    const price = getRandomNumber(
+      OfferValidation.price.rule.min,
+      OfferValidation.price.rule.max,
+    );
     const features = getRandomChunk(serverMock.feature).join(';');
     const author = getRandomItem(serverMock.users).join(';');
     const location = getRandomItem(serverMock.location).map(String).join(';');

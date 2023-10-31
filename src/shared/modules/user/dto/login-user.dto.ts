@@ -1,4 +1,3 @@
-export class LoginUserDto {
-  public email: string;
-  public password: string;
-}
+import { BaseUserDto } from './base-user.dto.js';
+
+export class LoginUserDto extends BaseUserDto {}

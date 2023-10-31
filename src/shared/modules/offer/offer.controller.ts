@@ -1,5 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/index.js';
 import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/index.js';
@@ -10,26 +11,93 @@ import { fillDto, fillParams } from '../../utils/common.js';
 import { OfferShortRdo } from './rdo/offer-short.rdo.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
-import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, UpdateOfferRequest } from './types.js';
+import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './types.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
+import { CreateOfferDto } from './index.js';
+import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
+import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
+import { RequestField } from '../../lib/rest/types/index.js';
+import { PremiumDto } from './dto/premium.dto.js';
+import { UserService } from '../user/index.js';
 
 @injectable()
 export class OfferController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
-    @inject(Component.OfferService) protected readonly offerService: OfferService
-
+    @inject(Component.OfferService) protected readonly offerService: OfferService,
+    @inject(Component.UserService) private readonly userService: UserService,
   ) {
     super(logger);
 
     this.logger.info('Register routes for OfferController');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.show });
-    this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
-    this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
-    this.addRoute({ path: '/premium/:city', method: HttpMethod.Get, handler: this.premiumForCity });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [
+        new ValidateDtoMiddleware(CreateOfferDto),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          RequestField.Body,
+          'authorId',
+        ),
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.show,
+      middlewares: [
+        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Params,
+          'id',
+        ),
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Patch,
+      handler: this.update,
+      middlewares: [
+        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Params,
+          'id',
+        ),
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Params,
+          'id',
+        ),
+      ]
+    });
+    this.addRoute({
+      path: '/premium/:city',
+      method: HttpMethod.Get,
+      handler: this.premiumForCity,
+      middlewares: [
+        new ValidateDtoMiddleware(PremiumDto, RequestField.Params)
+      ],
+    });
   }
 
   private async index(req: Request, res: Response) {
@@ -46,27 +114,13 @@ export class OfferController extends BaseController {
     return this.created(res, fillDto(OfferRdo, offer));
   }
 
-  private async show(req: Request, res: Response) {
+  private async show(req: ShowOfferRequest, res: Response) {
     const offer = await this.offerService.findById(req.params.id);
 
-    if (offer) {
-      return this.ok(res, fillDto(OfferRdo, offer));
-    }
-
-    throw new HttpError(404, 'Not found');
+    return this.ok(res, fillDto(OfferRdo, offer));
   }
 
   private async update(req: UpdateOfferRequest, res: Response) {
-    if (!req.params.id) {
-      throw new HttpError(400, 'Bad Request', 'OfferId should be defined');
-    }
-
-    const offerExists = await this.offerService.exists(req.params.id);
-
-    if (!offerExists) {
-      throw new HttpError(404, 'Not found');
-    }
-
     const updatedOffer = await this.offerService.update(
       req.params.id,
       fillParams(UpdateOfferDto, req.body)
@@ -76,16 +130,6 @@ export class OfferController extends BaseController {
   }
 
   private async delete(req: DeleteOfferRequest, res: Response) {
-    if (!req.params.id) {
-      throw new HttpError(400, 'Bad Request', 'OfferId should be defined');
-    }
-
-    const offerExists = await this.offerService.exists(req.params.id);
-
-    if (!offerExists) {
-      throw new HttpError(404, 'Not found');
-    }
-
     await this.offerService.delete(req.params.id);
 
     this.noContent(res);
@@ -93,7 +137,11 @@ export class OfferController extends BaseController {
 
   private async premiumForCity(req: PremiumForCityRequest, res: Response) {
     if (!req.params.city) {
-      throw new HttpError(400, 'Bad request', 'City should be specified');
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        'Bad request',
+        'City should be specified',
+      );
     }
 
     const offers = await this.offerService.findPremiumForCity(

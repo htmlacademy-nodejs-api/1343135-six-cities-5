@@ -1,6 +1,6 @@
 # Favorite
 ## Get favorite list
-GET http://localhost:3000/offers/favorite?userId=652be4d978399a7fa78c09a7 HTTP/1.1
+GET http://localhost:3000/offers/favorite/652be4d978399a7fa78c09a7 HTTP/1.1
 
 ###
 
