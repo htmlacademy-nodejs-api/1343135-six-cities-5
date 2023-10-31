@@ -5,7 +5,7 @@ import {
   ValidatorConstraintInterface,
   isLatitude,
   isLongitude,
-  isURL,
+  isString,
 } from 'class-validator';
 import { ClassConstructor } from 'class-transformer';
 
@@ -44,8 +44,7 @@ export function FileUrlValidator(formats: readonly string[]) {
   @ValidatorConstraint({ name: 'file-url', async: false })
   class IsValidFileUrl implements ValidatorConstraintInterface {
     validate(value: unknown, _args: ValidationArguments) {
-      return typeof value === 'string' &&
-        isURL(value) &&
+      return isString(value) &&
         formats.some((format) => value.endsWith(format));
     }
 
