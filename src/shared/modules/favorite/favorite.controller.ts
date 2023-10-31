@@ -12,7 +12,7 @@ import { OfferService, OfferShortRdo } from '../offer/index.js';
 import { CreateFavoriteRdo } from './rdo/CreateFavoriteRdo.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
-import { CreateFavoriteDto, DeleteFavoriteDto } from './index.js';
+import { CreateFavoriteDto } from './index.js';
 import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
 import { UserService } from '../user/index.js';
 import { RequestField } from '../../lib/rest/types/index.js';
@@ -63,11 +63,24 @@ export class FavoriteController extends BaseController {
       ],
     });
     this.addRoute({
-      path: '/',
+      path: '/:offerId/:userId',
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
-        new ValidateDtoMiddleware(DeleteFavoriteDto)
+        new ValidateObjectIdMiddleware(RequestField.Params, 'offerId'),
+        new ValidateObjectIdMiddleware(RequestField.Params, 'userId'),
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Params,
+          'offerId',
+        ),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          RequestField.Params,
+          'userId',
+        ),
       ]
     });
   }
@@ -88,7 +101,8 @@ export class FavoriteController extends BaseController {
   }
 
   private async delete(req: DeleteFavoriteRequest, res: Response) {
-    await this.favoriteService.delete(req.body);
+    const { offerId, userId } = req.params;
+    await this.favoriteService.delete({ offerId, userId });
     this.noContent(res);
   }
 }

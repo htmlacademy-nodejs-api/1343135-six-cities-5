@@ -16,10 +16,4 @@ Content-Type: application/json
 ###
 
 ## Delete offer from favorite
-DELETE http://localhost:3000/offers/favorite HTTP/1.1
-Content-Type: application/json
-
-{
-  "offerId": "65354a7b6626eeefa84ea022",
-  "userId": "652be4d978399a7fa78c09a7"
-}
+DELETE http://localhost:3000/offers/favorite/65354a7b6626eeefa84ea022/652be4d978399a7fa78c09a7 HTTP/1.1

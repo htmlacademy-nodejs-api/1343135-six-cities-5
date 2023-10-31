@@ -27,8 +27,8 @@ paths:
       summary: Get offers
       description: Get the list of offers
       parameters:
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
 
       responses:
         "200":
@@ -217,8 +217,8 @@ paths:
           schema:
             type: string
             example: 6522aa1decfcf1bc655a2538
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
 
       responses:
         "200":
@@ -275,6 +275,7 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
+  /offers/favorite/{offerId}/{userId}:
     delete:
       tags:
         - favorite
@@ -284,23 +285,20 @@ paths:
       security:
         - BearerAuth: []
 
-      requestBody:
-        content:
-          application/json:
-            schema:
-              # TODO: fix after authorization is ready
-              type: object
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 6522aa1decfcf1bc655a2547
 
-              properties:
-                offerId:
-                  type: string
-                  example: 6522aa1decfcf1bc655a2547
-
-                userId:
-                  type: string
-                  example: 652be40f1dc314f63108b51b
-
-        required: true
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 652be40f1dc314f63108b51b
 
       responses:
         "204":
@@ -330,8 +328,8 @@ paths:
           schema:
             type: string
             example: 652be40f1dc314f63108b51b
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
 
       responses:
         "200":
@@ -358,8 +356,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/city'
-        - $ref: '#components/parameters/limit'
-        - $ref: '#components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
 
 
       responses:
