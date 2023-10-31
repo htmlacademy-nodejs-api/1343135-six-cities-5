@@ -14,6 +14,7 @@ import { HttpMethod } from '../../lib/rest/types/http-method.enum.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
+import { RequestField } from '../../lib/rest/types/index.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -31,16 +32,20 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.signup ,
       middlewares: [
-        new ValidateDtoMiddleware(CreateUserDto)
-      ]
+        new ValidateDtoMiddleware(CreateUserDto),
+      ],
     });
     this.addRoute({
       path: '/login',
       method: HttpMethod.Post,
       handler: this.login,
       middlewares: [
-        new ValidateDtoMiddleware(LoginUserDto, 'Invalid email or password')
-      ]
+        new ValidateDtoMiddleware(
+          LoginUserDto,
+          RequestField.Body,
+          'Invalid email or password',
+        ),
+      ],
     });
   }
 

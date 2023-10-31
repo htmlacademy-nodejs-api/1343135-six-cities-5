@@ -13,13 +13,16 @@ import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-o
 import { DocumentExistsMiddleware, ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
 import { CreateCommentDto } from './index.js';
 import { OfferService } from '../offer/index.js';
+import { RequestField } from '../../lib/rest/types/index.js';
+import { UserService } from '../user/index.js';
 
 @injectable()
 export class CommentController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
     @inject(Component.CommentService) private readonly commentService: CommentService,
-    @inject(Component.OfferService) private readonly offerService: OfferService
+    @inject(Component.OfferService) private readonly offerService: OfferService,
+    @inject(Component.UserService) private readonly userService: UserService,
   ) {
     super(logger);
 
@@ -29,16 +32,33 @@ export class CommentController extends BaseController {
       handler: this.create,
       middlewares: [
         new ValidateDtoMiddleware(CreateCommentDto),
-      ]
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Body,
+          'offerId',
+        ),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          RequestField.Body,
+          'authorId',
+        ),
+      ],
     });
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Get,
       handler: this.show,
       middlewares: [
-        new ValidateObjectIdMiddleware('offerId'),
-        new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
-      ]
+        new ValidateObjectIdMiddleware(RequestField.Params, 'offerId'),
+        new DocumentExistsMiddleware(
+          this.offerService,
+          'Offer',
+          RequestField.Params,
+          'offerId',
+        ),
+      ],
     });
   }
 
