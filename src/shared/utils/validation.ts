@@ -6,6 +6,7 @@ import {
   isLatitude,
   isLongitude,
   isString,
+  ValidationError,
 } from 'class-validator';
 import { ClassConstructor } from 'class-transformer';
 
@@ -56,3 +57,14 @@ export function FileUrlValidator(formats: readonly string[]) {
   return IsValidFileUrl;
 }
 
+export function getValidationError(errors: ValidationError[]) {
+  const result: Record<string, string> = {};
+
+  for (const error of errors) {
+    result[error.property] = error.constraints
+      ? Object.values(error.constraints).join('; ')
+      : `value "${error.value}" is invalid`;
+  }
+
+  return result;
+}

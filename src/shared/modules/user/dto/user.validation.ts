@@ -1,4 +1,5 @@
 import { UserType } from '../../../types/user-type.enum.js';
+import { AVATAR_FORMATS } from '../consts.js';
 
 export const UserValidation = {
   name: {
@@ -34,7 +35,7 @@ export const UserValidation = {
     }
   },
   avatar: {
-    formats: ['.jpg', '.jpeg', '.png'],
+    formats: AVATAR_FORMATS.ext,
     message: {
       format: 'avatar must be a string',
       value: 'avatar must be a valid url to .jpg or .png image',

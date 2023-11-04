@@ -4,7 +4,7 @@ import { ClassConstructor, plainToInstance } from 'class-transformer';
 import validator from 'class-validator';
 import { Middleware } from './middleware.interface.js';
 import { RequestSelector } from '../types/index.js';
-import { getValidationError } from '../../../utils/common.js';
+import { getValidationError } from '../../../utils/validation.js';
 
 export class ValidateDtoMiddleware<T> implements Middleware {
   constructor(

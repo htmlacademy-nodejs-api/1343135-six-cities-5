@@ -16,6 +16,8 @@ import { LoginUserDto } from './dto/login-user.dto.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
 import { FileUploadMiddleware } from '../../lib/rest/middleware/file-upload.middleware.js';
 import { DocumentExistsMiddleware, ValidateObjectIdMiddleware } from '../../lib/rest/middleware/index.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { AVATAR_FORMATS } from './consts.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -54,11 +56,17 @@ export class UserController extends BaseController {
       handler: this.uploadAvatar,
       middlewares: [
         new ValidateObjectIdMiddleware((req: UploadAvatarRequest) => req.params.id),
+        new ValidateDtoMiddleware(UpdateUserDto, (req: UploadAvatarRequest) => req.body),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
           (req: UploadAvatarRequest) => req.params.id),
-        new FileUploadMiddleware(this.config.get('UPLOAD_DIR'), 'avatar'),
+        new FileUploadMiddleware(
+          this.config.get('UPLOAD_DIR'),
+          'avatar',
+          AVATAR_FORMATS.mimeTypes,
+          AVATAR_FORMATS.ext,
+        ),
       ],
     });
   }
