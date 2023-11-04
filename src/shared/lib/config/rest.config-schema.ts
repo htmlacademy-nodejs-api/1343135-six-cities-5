@@ -46,6 +46,12 @@ export const restConfigSchema = convict({
     env: 'DB_NAME',
     default: 'six-cities'
   },
+  UPLOAD_DIR: {
+    doc: 'Upload directory path',
+    format: String,
+    env: 'UPLOAD_DIR',
+    default: '',
+  },
 });
 
 export type RestConfigSchema = ReturnType<typeof restConfigSchema.getProperties>;

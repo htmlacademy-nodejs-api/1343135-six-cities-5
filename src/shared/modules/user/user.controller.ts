@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/base-controller.abstract.js';
 import { Logger } from '../../lib/logger/index.js';
 import { Component } from '../../types/component.enum.js';
-import { LoginUserRequest, SignupUserRequest } from './types.js';
+import { LoginUserRequest, SignupUserRequest, UploadAvatarRequest } from './types.js';
 import { CreateUserDto, UserService } from './index.js';
 import { Config, RestConfigSchema } from '../../lib/config/index.js';
 import { fillDto } from '../../utils/common.js';
@@ -14,7 +14,10 @@ import { HttpMethod } from '../../lib/rest/types/http-method.enum.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
-import { RequestField } from '../../lib/rest/types/index.js';
+import { FileUploadMiddleware } from '../../lib/rest/middleware/file-upload.middleware.js';
+import { DocumentExistsMiddleware, ValidateObjectIdMiddleware } from '../../lib/rest/middleware/index.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { AVATAR_FORMATS } from './consts.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -32,7 +35,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.signup ,
       middlewares: [
-        new ValidateDtoMiddleware(CreateUserDto),
+        new ValidateDtoMiddleware(CreateUserDto, (req) => req.body),
       ],
     });
     this.addRoute({
@@ -42,8 +45,27 @@ export class UserController extends BaseController {
       middlewares: [
         new ValidateDtoMiddleware(
           LoginUserDto,
-          RequestField.Body,
+          (req) => req.body,
           'Invalid email or password',
+        ),
+      ],
+    });
+    this.addRoute({
+      path: '/:id/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new ValidateObjectIdMiddleware((req: UploadAvatarRequest) => req.params.id),
+        new ValidateDtoMiddleware(UpdateUserDto, (req: UploadAvatarRequest) => req.body),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          (req: UploadAvatarRequest) => req.params.id),
+        new FileUploadMiddleware(
+          this.config.get('UPLOAD_DIR'),
+          'avatar',
+          AVATAR_FORMATS.mimeTypes,
+          AVATAR_FORMATS.ext,
         ),
       ],
     });
@@ -76,5 +98,10 @@ export class UserController extends BaseController {
       StatusCodes.BAD_REQUEST,
       'Invalid email or password',
     );
+  }
+
+  private async uploadAvatar(req: UploadAvatarRequest, res: Response) {
+    this.userService.update(req.params.id, { avatar: req.file?.path });
+    this.created(res, { file: req.file?.path });
   }
 }

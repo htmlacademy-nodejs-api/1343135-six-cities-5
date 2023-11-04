@@ -15,7 +15,6 @@ import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.mi
 import { CreateFavoriteDto } from './index.js';
 import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
 import { UserService } from '../user/index.js';
-import { RequestField } from '../../lib/rest/types/index.js';
 
 @injectable()
 export class FavoriteController extends BaseController {
@@ -34,12 +33,11 @@ export class FavoriteController extends BaseController {
       method: HttpMethod.Get,
       handler: this.index,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'userId'),
+        new ValidateObjectIdMiddleware((req) => req.params.userId),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Params,
-          'userId',
+          (req: IndexFavoriteRequest) => req.params.userId,
         )
       ] });
     this.addRoute({
@@ -47,18 +45,16 @@ export class FavoriteController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
-        new ValidateDtoMiddleware(CreateFavoriteDto),
+        new ValidateDtoMiddleware(CreateFavoriteDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Body,
-          'offerId',
+          (req: CreateFavoriteRequest) => req.body.offerId,
         ),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Body,
-          'userId',
+          (req: CreateFavoriteRequest) => req.body.userId,
         ),
       ],
     });
@@ -67,19 +63,17 @@ export class FavoriteController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'offerId'),
-        new ValidateObjectIdMiddleware(RequestField.Params, 'userId'),
+        new ValidateObjectIdMiddleware((req: DeleteFavoriteRequest) => req.params.offerId),
+        new ValidateObjectIdMiddleware((req: DeleteFavoriteRequest) => req.params.userId),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Params,
-          'offerId',
+          (req: DeleteFavoriteRequest) => req.params.offerId
         ),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Params,
-          'userId',
+          (req: DeleteFavoriteRequest) => req.params.userId
         ),
       ]
     });
