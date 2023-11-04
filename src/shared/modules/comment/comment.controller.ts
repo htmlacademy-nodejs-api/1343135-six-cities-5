@@ -13,7 +13,6 @@ import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-o
 import { DocumentExistsMiddleware, ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
 import { CreateCommentDto } from './index.js';
 import { OfferService } from '../offer/index.js';
-import { RequestField } from '../../lib/rest/types/index.js';
 import { UserService } from '../user/index.js';
 
 @injectable()
@@ -31,18 +30,16 @@ export class CommentController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
-        new ValidateDtoMiddleware(CreateCommentDto),
+        new ValidateDtoMiddleware(CreateCommentDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Body,
-          'offerId',
+          (req: CreateCommentRequest) => req.body.offerId,
         ),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Body,
-          'authorId',
+          (req: CreateCommentRequest) => req.body.authorId,
         ),
       ],
     });
@@ -51,12 +48,11 @@ export class CommentController extends BaseController {
       method: HttpMethod.Get,
       handler: this.show,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'offerId'),
+        new ValidateObjectIdMiddleware((req: IndexCommentRequest) => req.params.offerId),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Params,
-          'offerId',
+          (req: IndexCommentRequest) => req.params.offerId,
         ),
       ],
     });

@@ -17,7 +17,6 @@ import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.mi
 import { CreateOfferDto } from './index.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
-import { RequestField } from '../../lib/rest/types/index.js';
 import { PremiumDto } from './dto/premium.dto.js';
 import { UserService } from '../user/index.js';
 
@@ -38,12 +37,11 @@ export class OfferController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
-        new ValidateDtoMiddleware(CreateOfferDto),
+        new ValidateDtoMiddleware(CreateOfferDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Body,
-          'authorId',
+          (req: CreateOfferRequest) => req.body.authorId,
         ),
       ]
     });
@@ -52,13 +50,11 @@ export class OfferController extends BaseController {
       method: HttpMethod.Get,
       handler: this.show,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new ValidateObjectIdMiddleware((req: ShowOfferRequest) => req.params.id),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Params,
-          'id',
-        ),
+          (req: ShowOfferRequest) => req.params.id),
       ]
     });
     this.addRoute({
@@ -66,14 +62,12 @@ export class OfferController extends BaseController {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
-        new ValidateDtoMiddleware(UpdateOfferDto),
+        new ValidateObjectIdMiddleware((req: UpdateOfferRequest) => req.params.id),
+        new ValidateDtoMiddleware(UpdateOfferDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Params,
-          'id',
-        ),
+          (req: UpdateOfferRequest) => req.params.id),
       ]
     });
     this.addRoute({
@@ -81,13 +75,11 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new ValidateObjectIdMiddleware((req: DeleteOfferRequest) => req.params.id),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
-          RequestField.Params,
-          'id',
-        ),
+          (req: DeleteOfferRequest) => req.params.id),
       ]
     });
     this.addRoute({
@@ -95,7 +87,10 @@ export class OfferController extends BaseController {
       method: HttpMethod.Get,
       handler: this.premiumForCity,
       middlewares: [
-        new ValidateDtoMiddleware(PremiumDto, RequestField.Params)
+        new ValidateDtoMiddleware(
+          PremiumDto,
+          (req: PremiumForCityRequest) => req.params.city,
+        ),
       ],
     });
   }

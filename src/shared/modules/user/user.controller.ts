@@ -14,7 +14,6 @@ import { HttpMethod } from '../../lib/rest/types/http-method.enum.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
-import { RequestField } from '../../lib/rest/types/index.js';
 import { FileUploadMiddleware } from '../../lib/rest/middleware/file-upload.middleware.js';
 import { DocumentExistsMiddleware, ValidateObjectIdMiddleware } from '../../lib/rest/middleware/index.js';
 
@@ -34,7 +33,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.signup ,
       middlewares: [
-        new ValidateDtoMiddleware(CreateUserDto),
+        new ValidateDtoMiddleware(CreateUserDto, (req) => req.body),
       ],
     });
     this.addRoute({
@@ -44,7 +43,7 @@ export class UserController extends BaseController {
       middlewares: [
         new ValidateDtoMiddleware(
           LoginUserDto,
-          RequestField.Body,
+          (req) => req.body,
           'Invalid email or password',
         ),
       ],
@@ -54,13 +53,11 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
-        new ValidateObjectIdMiddleware(RequestField.Params, 'id'),
+        new ValidateObjectIdMiddleware((req: UploadAvatarRequest) => req.params.id),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          RequestField.Params,
-          'id',
-        ),
+          (req: UploadAvatarRequest) => req.params.id),
         new FileUploadMiddleware(this.config.get('UPLOAD_DIR'), 'avatar'),
       ],
     });
