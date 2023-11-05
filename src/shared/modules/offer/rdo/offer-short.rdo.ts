@@ -33,4 +33,7 @@ export class OfferShortRdo {
 
   @Expose()
   public commentCount: number;
+
+  @Expose()
+  public isFavorite: boolean;
 }

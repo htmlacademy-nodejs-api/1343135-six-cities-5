@@ -11,7 +11,7 @@ import { fillDto, fillParams } from '../../utils/common.js';
 import { OfferShortRdo } from './rdo/offer-short.rdo.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
-import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './types.js';
+import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './offer.types.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
 import { CreateOfferDto } from './index.js';
@@ -19,6 +19,8 @@ import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-o
 import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
 import { PremiumDto } from './dto/premium.dto.js';
 import { UserService } from '../user/index.js';
+import { PrivateRouteMiddleware } from '../../lib/rest/middleware/private-route.middleware.js';
+import { FavoriteService } from '../favorite/index.js';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -26,6 +28,7 @@ export class OfferController extends BaseController {
     @inject(Component.Logger) protected readonly logger: Logger,
     @inject(Component.OfferService) protected readonly offerService: OfferService,
     @inject(Component.UserService) private readonly userService: UserService,
+    @inject(Component.FavoriteService) private readonly favoriteService: FavoriteService,
   ) {
     super(logger);
 
@@ -37,11 +40,12 @@ export class OfferController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateDtoMiddleware(CreateOfferDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req: CreateOfferRequest) => req.body.authorId,
+          (req: CreateOfferRequest) => req.tokenPayload.id,
         ),
       ]
     });
@@ -62,6 +66,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware((req: UpdateOfferRequest) => req.params.id),
         new ValidateDtoMiddleware(UpdateOfferDto, (req) => req.body),
         new DocumentExistsMiddleware(
@@ -75,6 +80,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware((req: DeleteOfferRequest) => req.params.id),
         new DocumentExistsMiddleware(
           this.offerService,
@@ -87,10 +93,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Get,
       handler: this.premiumForCity,
       middlewares: [
-        new ValidateDtoMiddleware(
-          PremiumDto,
-          (req: PremiumForCityRequest) => req.params.city,
-        ),
+        new ValidateDtoMiddleware(PremiumDto, (req) => req.params),
       ],
     });
   }
@@ -99,23 +102,37 @@ export class OfferController extends BaseController {
     const offers = await this.offerService.find(
       fillParams(Pagination, req.query)
     );
+    const isFavoriteMap = await this.favoriteService.getIsFavoriteMap(
+      offers.map((offer) => offer.id),
+      req.tokenPayload?.id,
+    );
+    const result = offers.map((offer) => ({
+      ...offer.toObject(),
+      isFavorite: isFavoriteMap[offer.id] || false,
+    }));
 
-    this.ok(res, fillDto(OfferShortRdo, offers));
+    this.ok(res, fillDto(OfferShortRdo, result));
   }
 
   private async create(req: CreateOfferRequest, res: Response) {
-    const offer = await this.offerService.create(req.body);
+    const offer = await this.offerService.create({
+      ...req.body,
+      authorId: req.tokenPayload.id
+    });
 
     return this.created(res, fillDto(OfferRdo, offer));
   }
 
   private async show(req: ShowOfferRequest, res: Response) {
+    const userId = req.tokenPayload?.id;
     const offer = await this.offerService.findById(req.params.id);
+    const isFavorite = await this.favoriteService.exists({ userId, offerId: req.params.id });
 
-    return this.ok(res, fillDto(OfferRdo, offer));
+    return this.ok(res, fillDto(OfferRdo, { ...offer?.toObject(), isFavorite }));
   }
 
   private async update(req: UpdateOfferRequest, res: Response) {
+    await this.checkAuthor(req);
     const updatedOffer = await this.offerService.update(
       req.params.id,
       fillParams(UpdateOfferDto, req.body)
@@ -125,6 +142,7 @@ export class OfferController extends BaseController {
   }
 
   private async delete(req: DeleteOfferRequest, res: Response) {
+    await this.checkAuthor(req);
     await this.offerService.delete(req.params.id);
 
     this.noContent(res);
@@ -143,7 +161,25 @@ export class OfferController extends BaseController {
       req.params.city,
       fillParams(Pagination, req.query)
     );
+    const isFavoriteMap = await this.favoriteService.getIsFavoriteMap(
+      offers.map((offer) => offer.id),
+      req.tokenPayload?.id,
+    );
+    const result = offers.map((offer) => ({
+      ...offer.toObject(),
+      isFavorite: isFavoriteMap[offer.id] || false,
+    }));
 
-    this.ok(res, fillDto(OfferShortRdo, offers));
+    this.ok(res, fillDto(OfferShortRdo, result));
+  }
+
+  private async checkAuthor(req: UpdateOfferRequest | DeleteOfferRequest) {
+    if(!await this.offerService.isAuthor(req.params.id, req.tokenPayload.id)) {
+      throw new HttpError(
+        StatusCodes.FORBIDDEN,
+        'Forbidden',
+        'Forbidden to update/delete if user is not an author',
+      );
+    }
   }
 }

@@ -59,11 +59,11 @@ export class UserController extends BaseController {
       handler: this.uploadAvatar,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new ValidateDtoMiddleware(UpdateUserDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
           (req) => req.tokenPayload.id),
+        new ValidateDtoMiddleware(UpdateUserDto, (req) => req.body),
         new FileUploadMiddleware(
           this.config.get('UPLOAD_DIR'),
           'avatar',

@@ -137,6 +137,9 @@ paths:
         "400":
           description: Invalid offer data is provided
 
+        "403":
+          description: Forbidden to update the offer
+
         "401":
           $ref: '#/components/responses/401'
 
@@ -167,6 +170,9 @@ paths:
 
         "400":
           description: Invalid request params
+
+        "403":
+          description: Forbidden to delete the offer
 
         "401":
           $ref: '#/components/responses/401'
@@ -247,17 +253,12 @@ paths:
         content:
           application/json:
             schema:
-              # TODO: fix after authorization is ready
               type: object
 
               properties:
                 offerId:
                   type: string
                   example: 6522aa1decfcf1bc655a2547
-
-                userId:
-                  type: string
-                  example: 652be40f1dc314f63108b51b
 
         required: true
 
@@ -267,7 +268,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/offerRdo'
+                type: object
+
+                properties:
+                  offerId:
+                    type: string
+                    example: 6522aa1decfcf1bc655a2547
 
         "400":
           description: Invalid offer data is provided
@@ -275,7 +281,7 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/favorite/{offerId}/{userId}:
+  /offers/favorite/{offerId}:
     delete:
       tags:
         - favorite
@@ -293,13 +299,6 @@ paths:
             type: string
             example: 6522aa1decfcf1bc655a2547
 
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: 652be40f1dc314f63108b51b
-
       responses:
         "204":
           description: Offer is deleted from favorite
@@ -309,6 +308,9 @@ paths:
 
         "401":
           $ref: '#/components/responses/401'
+
+        "403":
+          description: Forbidden
 
   /offers/favorite/{userId}:
     get:
@@ -672,7 +674,6 @@ components:
         - type
 
       properties:
-
         name:
           type: string
           example: Felix

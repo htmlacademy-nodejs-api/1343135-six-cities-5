@@ -10,6 +10,7 @@ import { Pagination } from '../../types/pagination.js';
 import { DefaultPaginationParams, RATING_PRESICION } from './consts.js';
 import { AddCommentDto } from './dto/add-comment.dto.js';
 import { floatToPrecision } from '../../utils/number.js';
+import { UserEntity } from '../user/user.entity.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -91,5 +92,10 @@ export class DefaultOfferService implements OfferService {
           rating: newRatingFixed
         },
       );
+  }
+
+  public async isAuthor(offerId: OfferEntity['id'], authorId: UserEntity['id']) {
+    const offer = await this.findById(offerId);
+    return offer?.author.id === authorId;
   }
 }

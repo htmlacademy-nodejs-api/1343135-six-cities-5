@@ -4,6 +4,7 @@ import { OfferEntity } from './offer.entity.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { Pagination } from '../../types/pagination.js';
 import { AddCommentDto } from './dto/add-comment.dto.js';
+import { UserEntity } from '../user/index.js';
 
 export interface OfferService {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>
@@ -14,4 +15,5 @@ export interface OfferService {
   find(pagination?: Pagination): Promise<DocumentType<OfferEntity>[]>
   findPremiumForCity(city: OfferEntity['city'], pagination?: Pagination): Promise<DocumentType<OfferEntity>[]>
   addComment(dto: AddCommentDto): Promise<DocumentType<OfferEntity> | null>
+  isAuthor(offerId: OfferEntity['id'], authorId: UserEntity['id']): Promise<boolean>
 }

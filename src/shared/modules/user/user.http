@@ -28,7 +28,7 @@ Content-Type: application/json
 
 POST http://localhost:3000/users/avatar HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MjAzMTAwLCJleHAiOjE2OTkyMDY3MDB9.B9TULjK0Y5KFJoCsKHIxKx5ZivoXKx3dt__cjriet1o
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="avatar"; filename="983.jpg"

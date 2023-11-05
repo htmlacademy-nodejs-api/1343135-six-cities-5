@@ -6,6 +6,7 @@ import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity, FavoriteService }
 import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 import { OfferEntity } from '../offer/offer.entity.js';
+import { IsFavoriteMap } from './favorite.types.js';
 
 @injectable()
 export class DefaultFavoriteService implements FavoriteService {
@@ -17,8 +18,8 @@ export class DefaultFavoriteService implements FavoriteService {
     const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
     const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
 
-    const result = await this.favoriteModel
-      .aggregate<types.DocumentType<OfferEntity>>([
+    return this.favoriteModel
+      .aggregate<OfferEntity>([
         { $match: { user: new mongoose.Types.ObjectId(userId) }},
         {
           $lookup: {
@@ -34,8 +35,6 @@ export class DefaultFavoriteService implements FavoriteService {
       .sort({ createdAt: -1 })
       .skip(calculatedOffset)
       .limit(calculatedLimit);
-
-    return result;
   }
 
   public async create({ userId, offerId }: CreateFavoriteDto) {
@@ -45,10 +44,34 @@ export class DefaultFavoriteService implements FavoriteService {
       favorite = await this.favoriteModel.create({ user: userId, offer: offerId });
     }
 
-    return favorite;
+    return favorite.toObject();
   }
 
   public async delete({ userId, offerId }: DeleteFavoriteDto) {
     await this.favoriteModel.findOneAndRemove({ user: userId, offer: offerId });
+  }
+
+  public async getIsFavoriteMap(offerIds: string[], userId?: string) {
+    if (!userId) {
+      return {};
+    }
+
+    const favoriteForUser = await this.findByUserId(userId);
+    const favoriteForUserSet = new Set(
+      favoriteForUser.map((offer) => offer._id.toString())
+    );
+
+    const result: IsFavoriteMap = {};
+
+    for (const offerId of offerIds) {
+      result[offerId] = favoriteForUserSet.has(offerId);
+    }
+
+    return result;
+  }
+
+  public async exists({ offerId, userId}: { offerId: string, userId: string }) {
+    const existing = await this.favoriteModel.findOne({ offer: offerId, user: userId });
+    return Boolean(existing);
   }
 }

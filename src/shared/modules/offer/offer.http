@@ -1,18 +1,19 @@
 # Offers
 ## Get offers list
-GET http://localhost:3000/offers?limit=2&offset=0 HTTP/1.1
+GET http://localhost:3000/offers HTTP/1.1
 Content-Type: application/json
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MjEzOTYxLCJleHAiOjE2OTkzODY3NjF9.qjHA-rUaxluANFaiKeMg-N2ycykHv415a1RCPpRmWT0
 ###
 
 ## Get offer by id
-GET http://localhost:3000/offers/653511d6aa125942390ee2a3 HTTP/1.1
-
+GET http://localhost:3000/offers/6547b51a66a3743d14a182a1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MjEwMDQzLCJleHAiOjE2OTkyMTM2NDN9.4KExO3awBsXO_dJ-LEeWgEFHeZVhRgB2i53Mnl7Lx7A
 ###
 
 ## Create offer
 POST http://localhost:3000/offers HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
 
 {
   "title": "Luxury Downtown Studio",
@@ -40,27 +41,29 @@ Content-Type: application/json
   "location": [
     48.85661,
     2.351499
-  ],
-  "authorId": "652be3597a5a1679d11b2a1e"
+  ]
 }
 
 ###
 
 ## Update offer
-PATCH http://localhost:3000/offers/652be4d978399a7fa78c09b4 HTTP/1.1
+PATCH http://localhost:3000/offers/6547bcfa05b1285ed59d16cc HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
 
 {
-  "housingType": "house"
+  "housingType": "apartment"
 }
 
 ###
 
 ## Delete offer
-DELETE http://localhost:3000/offers/653511d6aa125942390ee2a3 HTTP/1.1
+DELETE http://localhost:3000/offers/6547bcfa05b1285ed59d16cc HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
 
 ###
 
 ## Get premium offers for the city
 GET http://localhost:3000/offers/premium/Paris HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MjE0OTYwLCJleHAiOjE2OTkzODc3NjB9.UyWF0mGzfGAIOCrwWSaVL4_krkUf0miOu_dNZ48Z_dw
