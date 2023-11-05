@@ -425,28 +425,15 @@ paths:
         required: true
 
       responses:
-        "204":
+        "200":
           description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRdo'
 
         "400":
           description: Invalid login data is provided
-
-  /users/logout:
-    get:
-      tags:
-        - users
-      summary: Logout
-      description: Logout user
-
-      security:
-        - BearerAuth: []
-
-      responses:
-        "204":
-          description: Logged out successfully
-
-        "401":
-          $ref: '#/components/responses/401'
 
   /users/status:
     get:
@@ -728,6 +715,18 @@ components:
         avatar:
           type: string
           example: http://my_avatar.uk/felix.jpg
+
+    loggedUserRdo:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: felix-at-home@mail.com
+
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
 
     city:
       enum:

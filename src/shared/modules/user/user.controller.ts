@@ -1,11 +1,11 @@
 import { injectable, inject } from 'inversify';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { BaseController } from '../../lib/rest/controller/base-controller.abstract.js';
 import { Logger } from '../../lib/logger/index.js';
 import { Component } from '../../types/component.enum.js';
-import { LoginUserRequest, SignupUserRequest, UploadAvatarRequest } from './types.js';
+import { LoginUserRequest, SignupUserRequest } from './types.js';
 import { CreateUserDto, UserService } from './index.js';
 import { Config, RestConfigSchema } from '../../lib/config/index.js';
 import { fillDto } from '../../utils/common.js';
@@ -15,16 +15,19 @@ import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.mi
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { HttpError } from '../../lib/rest/errors/index.js';
 import { FileUploadMiddleware } from '../../lib/rest/middleware/file-upload.middleware.js';
-import { DocumentExistsMiddleware, ValidateObjectIdMiddleware } from '../../lib/rest/middleware/index.js';
+import { DocumentExistsMiddleware, PrivateRouteMiddleware } from '../../lib/rest/middleware/index.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { AVATAR_FORMATS } from './consts.js';
+import { AuthService } from '../auth/index.js';
+import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
 
 @injectable()
 export class UserController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
     @inject(Component.UserService) private readonly userService: UserService,
-    @inject(Component.Config) private readonly config: Config<RestConfigSchema>
+    @inject(Component.Config) private readonly config: Config<RestConfigSchema>,
+    @inject(Component.AuthService) private readonly authService: AuthService,
   ) {
     super(logger);
 
@@ -51,16 +54,16 @@ export class UserController extends BaseController {
       ],
     });
     this.addRoute({
-      path: '/:id/avatar',
+      path: '/avatar',
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
-        new ValidateObjectIdMiddleware((req: UploadAvatarRequest) => req.params.id),
-        new ValidateDtoMiddleware(UpdateUserDto, (req: UploadAvatarRequest) => req.body),
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(UpdateUserDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req: UploadAvatarRequest) => req.params.id),
+          (req) => req.tokenPayload.id),
         new FileUploadMiddleware(
           this.config.get('UPLOAD_DIR'),
           'avatar',
@@ -88,20 +91,13 @@ export class UserController extends BaseController {
   }
 
   private async login(req: LoginUserRequest, res: Response) {
-    const isLoggedIn = await this.userService.login(req.body, this.config.get('SALT'));
-
-    if (isLoggedIn) {
-      return this.noContent(res);
-    }
-
-    throw new HttpError(
-      StatusCodes.BAD_REQUEST,
-      'Invalid email or password',
-    );
+    const token = await this.authService.authenticate(req.body);
+    const data = fillDto(LoggedUserRdo, { token, email: req.body.email });
+    this.ok(res, data);
   }
 
-  private async uploadAvatar(req: UploadAvatarRequest, res: Response) {
-    this.userService.update(req.params.id, { avatar: req.file?.path });
+  private async uploadAvatar(req: Request, res: Response) {
+    this.userService.update(req.tokenPayload.id, { avatar: req.file?.path });
     this.created(res, { file: req.file?.path });
   }
 }
