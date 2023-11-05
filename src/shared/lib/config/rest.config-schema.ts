@@ -52,6 +52,12 @@ export const restConfigSchema = convict({
     env: 'UPLOAD_DIR',
     default: '',
   },
+  JWT_SECRET: {
+    doc: 'JWT secret',
+    format: String,
+    env: 'JWT_SECRET',
+    default: '',
+  },
 });
 
 export type RestConfigSchema = ReturnType<typeof restConfigSchema.getProperties>;
