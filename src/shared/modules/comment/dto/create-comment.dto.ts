@@ -27,6 +27,5 @@ export class CreateCommentDto {
   @IsMongoId({ message: validation.offerId.message.format })
   public offerId: string;
 
-  @IsMongoId({ message: validation.authorId.message.format })
   public authorId: string;
 }
