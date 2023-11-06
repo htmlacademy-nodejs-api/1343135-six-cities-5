@@ -20,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 import { AVATAR_FORMATS } from './consts.js';
 import { AuthService } from '../auth/index.js';
 import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
+import { ComposedValidator, FileExtensionValidator, FileMimeValidator } from '../../utils/validation.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -67,8 +68,10 @@ export class UserController extends BaseController {
         new FileUploadMiddleware(
           this.config.get('UPLOAD_DIR'),
           'avatar',
-          AVATAR_FORMATS.mimeTypes,
-          AVATAR_FORMATS.ext,
+          new ComposedValidator([
+            new FileMimeValidator(AVATAR_FORMATS.mimeTypes),
+            new FileExtensionValidator(AVATAR_FORMATS.ext),
+          ]),
         ),
       ],
     });

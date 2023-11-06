@@ -5,13 +5,13 @@ import { nanoid } from 'nanoid';
 import { StatusCodes } from 'http-status-codes';
 import { Middleware } from './middleware.interface.js';
 import { HttpError } from '../errors/index.js';
+import { Validator } from '../../../types/validator.interface.js';
 
 export class FileUploadMiddleware implements Middleware {
   constructor(
     private readonly directory: string,
     private readonly fieldName: string,
-    private readonly allowedMimeTypes: string[],
-    private readonly allowedExt: string[],
+    private readonly validator: Validator<Express.Multer.File>,
   ) {}
 
   execute(req: Request, res: Response, next: NextFunction) {
@@ -25,18 +25,17 @@ export class FileUploadMiddleware implements Middleware {
         }
       }),
       fileFilter: (_req, file, cb) => {
-        if (
-          !this.allowedMimeTypes.includes(file.mimetype) ||
-          !this.allowedExt.some((ext) => file.originalname.endsWith(ext))
-        ) {
+        const validationResult = this.validator.validate(file);
+        if (validationResult.error) {
           return cb(
             new HttpError(
               StatusCodes.BAD_REQUEST,
-              'Invalid file format',
+              validationResult.error.message,
               'FileUploadMiddleware'
             )
           );
         }
+
         return cb(null, true);
       }
     }).single(this.fieldName);
