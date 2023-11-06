@@ -7,6 +7,7 @@ import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 import { OfferEntity } from '../offer/offer.entity.js';
 import { IsFavoriteMap } from './favorite.types.js';
+import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
 export class DefaultFavoriteService implements FavoriteService {
@@ -14,9 +15,8 @@ export class DefaultFavoriteService implements FavoriteService {
     @inject(Component.FavoriteModel) private readonly favoriteModel: types.ModelType<FavoriteEntity>
   ) {}
 
-  public async findByUserId(userId: string, pagination?: Pagination | undefined) {
-    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
-    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
+  public async findByUserId(userId: string, pagination?: Pagination) {
+    const { offset, limit } = getPaginationParams(pagination, DefaultPaginationParams);
 
     return this.favoriteModel
       .aggregate<OfferEntity>([
@@ -33,8 +33,8 @@ export class DefaultFavoriteService implements FavoriteService {
         { $replaceWith: '$offers' },
       ])
       .sort({ createdAt: -1 })
-      .skip(calculatedOffset)
-      .limit(calculatedLimit);
+      .skip(offset)
+      .limit(limit);
   }
 
   public async create({ userId, offerId }: CreateFavoriteDto) {

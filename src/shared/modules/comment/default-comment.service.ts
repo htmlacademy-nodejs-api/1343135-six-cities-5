@@ -5,6 +5,7 @@ import { CommentEntity, CommentService, CreateCommentDto } from './index.js';
 import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 import { OfferService } from '../offer/index.js';
+import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
 export class DefaultCommentService implements CommentService {
@@ -14,14 +15,13 @@ export class DefaultCommentService implements CommentService {
   ) {}
 
   public async findByOfferId(id: string, pagination?: Pagination) {
-    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
-    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
+    const { offset, limit } = getPaginationParams(pagination, DefaultPaginationParams);
 
     const comments = await this.commentModel
       .find({ offer: id })
       .sort({ createdAt: -1 })
-      .skip(calculatedOffset)
-      .limit(calculatedLimit)
+      .skip(offset)
+      .limit(limit)
       .populate('author');
 
     return comments;

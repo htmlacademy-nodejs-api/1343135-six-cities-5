@@ -1,5 +1,5 @@
 export const DefaultPaginationParams = {
-  offet: 0,
+  offset: 0,
   limit: 60,
   limitPremium: 3,
 };

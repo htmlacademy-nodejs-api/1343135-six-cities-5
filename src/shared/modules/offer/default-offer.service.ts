@@ -11,6 +11,7 @@ import { DefaultPaginationParams, RATING_PRESICION } from './consts.js';
 import { AddCommentDto } from './dto/add-comment.dto.js';
 import { floatToPrecision } from '../../utils/number.js';
 import { UserEntity } from '../user/user.entity.js';
+import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
@@ -45,33 +46,37 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async find(pagination?: Pagination) {
-    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
-    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
+    const { offset, limit } = getPaginationParams(pagination, DefaultPaginationParams);
 
-    if (calculatedLimit === 0) {
+    if (limit === 0) {
       return [];
     }
 
     return this.offerModel
       .find()
       .sort({ createdAt: -1 })
-      .skip(calculatedOffset)
-      .limit(calculatedLimit);
+      .skip(offset)
+      .limit(limit);
   }
 
   public async findPremiumForCity(city: CityValue, pagination?: Pagination) {
-    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offet;
-    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limitPremium;
+    const { offset, limit } = getPaginationParams(
+      pagination,
+      {
+        offset: DefaultPaginationParams.offset,
+        limit: DefaultPaginationParams.limitPremium,
+      },
+    );
 
-    if (calculatedLimit === 0) {
+    if (limit === 0) {
       return [];
     }
 
     return this.offerModel
       .find({ city, isPremium: true })
       .sort({ createdAt: -1 })
-      .skip(calculatedOffset)
-      .limit(calculatedLimit);
+      .skip(offset)
+      .limit(limit);
   }
 
   public async addComment(dto: AddCommentDto) {
