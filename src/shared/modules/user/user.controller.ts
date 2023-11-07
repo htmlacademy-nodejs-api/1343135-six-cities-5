@@ -79,7 +79,7 @@ export class UserController extends BaseController {
         new ValidateDtoMiddleware(UpdateUserDto, (req) => req.body),
         new FileUploadMiddleware(
           this.config.get('UPLOAD_DIR'),
-          'avatar',
+          'fileName',
           new ComposedValidator([
             new FileMimeValidator(AVATAR_FORMATS.mimeTypes),
             new FileExtensionValidator(AVATAR_FORMATS.ext),
