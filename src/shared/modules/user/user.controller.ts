@@ -55,6 +55,18 @@ export class UserController extends BaseController {
       ],
     });
     this.addRoute({
+      path: '/status',
+      method: HttpMethod.Get,
+      handler: this.status,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          (req) => req.tokenPayload.id),
+      ],
+    });
+    this.addRoute({
       path: '/avatar',
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
@@ -97,6 +109,11 @@ export class UserController extends BaseController {
     const token = await this.authService.authenticate(req.body);
     const data = fillDto(LoggedUserRdo, { token, email: req.body.email });
     this.ok(res, data);
+  }
+
+  private async status(req: Request, res: Response) {
+    const user = await this.userService.findById(req.tokenPayload.id);
+    this.ok(res, fillDto(UserRdo, user));
   }
 
   private async uploadAvatar(req: Request, res: Response) {

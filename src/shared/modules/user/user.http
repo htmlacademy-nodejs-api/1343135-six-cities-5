@@ -5,7 +5,7 @@ Content-Type: application/json
 
 {
   "name": "Pavel Mareev",
-  "email": "mareev1@gmail.com",
+  "email": "mareev2321@gmail.com",
   "type": "default",
   "password": "secret_01234",
   "avatar": "my-avatard.uk/felix.jpg"
@@ -21,6 +21,13 @@ Content-Type: application/json
   "email": "mareev2321@gmail.com",
   "password": "secret_01234"
 }
+
+###
+
+## Status
+GET http://localhost:3000/users/status HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NGE5NjE2ZTZiYmI2Njc5ZWZlZjMzMyIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5Mzg2OTEwLCJleHAiOjE2OTk1NTk3MTB9.Gk5p1FBFiGcrbGkmfiR-hVfObWQ_yUrmNi-TZvehxaM
 
 ###
 
