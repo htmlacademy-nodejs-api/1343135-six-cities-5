@@ -14,13 +14,14 @@ import { HttpError } from '../../lib/rest/errors/index.js';
 import { CreateOfferRequest, DeleteOfferRequest, PremiumForCityRequest, ShowOfferRequest, UpdateOfferRequest } from './offer.types.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { ValidateDtoMiddleware } from '../../lib/rest/middleware/validate-dto.middleware.js';
-import { CreateOfferDto } from './index.js';
+import { CreateOfferDto, OfferEntity } from './index.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
 import { DocumentExistsMiddleware } from '../../lib/rest/middleware/document-exists.middleware.js';
 import { PremiumDto } from './dto/premium.dto.js';
-import { UserService } from '../user/index.js';
+import { UserEntity, UserService } from '../user/index.js';
 import { PrivateRouteMiddleware } from '../../lib/rest/middleware/private-route.middleware.js';
 import { FavoriteService } from '../favorite/index.js';
+import { DocumentType } from '@typegoose/typegoose';
 
 @injectable()
 export class OfferController extends BaseController {
@@ -102,14 +103,7 @@ export class OfferController extends BaseController {
     const offers = await this.offerService.find(
       fillParams(Pagination, req.query)
     );
-    const isFavoriteMap = await this.favoriteService.getIsFavoriteMap(
-      offers.map((offer) => offer.id),
-      req.tokenPayload?.id,
-    );
-    const result = offers.map((offer) => ({
-      ...offer.toObject(),
-      isFavorite: isFavoriteMap[offer.id] || false,
-    }));
+    const result = await this.populateIsFavorite(offers, req.tokenPayload.id);
 
     this.ok(res, fillDto(OfferShortRdo, result));
   }
@@ -161,14 +155,7 @@ export class OfferController extends BaseController {
       req.params.city,
       fillParams(Pagination, req.query)
     );
-    const isFavoriteMap = await this.favoriteService.getIsFavoriteMap(
-      offers.map((offer) => offer.id),
-      req.tokenPayload?.id,
-    );
-    const result = offers.map((offer) => ({
-      ...offer.toObject(),
-      isFavorite: isFavoriteMap[offer.id] || false,
-    }));
+    const result = await this.populateIsFavorite(offers, req.tokenPayload.id);
 
     this.ok(res, fillDto(OfferShortRdo, result));
   }
@@ -181,5 +168,18 @@ export class OfferController extends BaseController {
         'Forbidden to update/delete if user is not an author',
       );
     }
+  }
+
+  private async populateIsFavorite(offers: DocumentType<OfferEntity>[], userId?: UserEntity['id']) {
+    const favoriteOfferIds = await this.favoriteService.getFavoriteOfferIds(
+      offers.map((offer) => offer.id),
+      userId,
+    );
+    const favoriteOfferIdsSet = new Set(favoriteOfferIds);
+
+    return offers.map((offer) => ({
+      ...offer.toObject(),
+      isFavorite: favoriteOfferIdsSet.has(offer.id),
+    }));
   }
 }

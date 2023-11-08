@@ -2,7 +2,7 @@
 ## Get offers list
 GET http://localhost:3000/offers HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MjEzOTYxLCJleHAiOjE2OTkzODY3NjF9.qjHA-rUaxluANFaiKeMg-N2ycykHv415a1RCPpRmWT0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NGE5NjE2ZTZiYmI2Njc5ZWZlZjMzMyIsImlhdCI6MTY5OTQ3NzA2MSwiZXhwIjoxNjk5NjQ5ODYxfQ.CuBJinmtH2d8v6KMyN8M07Kzk2oo6AC9GA6VMheK9Yg
 ###
 
 ## Get offer by id

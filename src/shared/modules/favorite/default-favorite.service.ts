@@ -6,7 +6,6 @@ import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity, FavoriteService }
 import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 import { OfferEntity } from '../offer/offer.entity.js';
-import { IsFavoriteMap } from './favorite.types.js';
 import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
@@ -51,23 +50,39 @@ export class DefaultFavoriteService implements FavoriteService {
     await this.favoriteModel.findOneAndRemove({ user: userId, offer: offerId });
   }
 
-  public async getIsFavoriteMap(offerIds: string[], userId?: string) {
+  public async getFavoriteOfferIds(offerIds: string[], userId?: string) {
     if (!userId) {
-      return {};
+      return [];
     }
 
-    const favoriteForUser = await this.findByUserId(userId);
-    const favoriteForUserSet = new Set(
-      favoriteForUser.map((offer) => offer._id.toString())
-    );
+    const offers = await this.favoriteModel
+      .aggregate<Pick<OfferEntity, '_id'>>([
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(userId),
+            offer: {
+              $in: offerIds.map((id) => new mongoose.Types.ObjectId(id))
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'offers',
+            localField: 'offer',
+            foreignField: '_id',
+            as: 'offers',
+          }
+        },
+        { $unwind: '$offers' },
+        { $replaceWith: '$offers' },
+        {
+          $project: {
+            _id: true,
+          },
+        },
+      ]);
 
-    const result: IsFavoriteMap = {};
-
-    for (const offerId of offerIds) {
-      result[offerId] = favoriteForUserSet.has(offerId);
-    }
-
-    return result;
+    return offers.map((offer) => offer._id.toString());
   }
 
   public async exists({ offerId, userId}: { offerId: string, userId: string }) {

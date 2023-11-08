@@ -8,4 +8,3 @@ type Id = { offerId: string };
 export type IndexFavoriteRequest = Request<ParamsDictionary, OfferShortRdo, RequestBody, Pagination>
 export type CreateFavoriteRequest = Request<RequestParams, OfferShortRdo, Id>
 export type DeleteFavoriteRequest = Request<ParamsDictionary | Id>
-export type IsFavoriteMap = Record<string, boolean>;
