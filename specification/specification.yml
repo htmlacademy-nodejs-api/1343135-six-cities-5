@@ -736,10 +736,6 @@ components:
           type: string
           example: Felix
 
-        email:
-          type: string
-          example: felix-at-home@mail.com
-
         type:
           $ref: '#/components/schemas/userType'
 
@@ -751,10 +747,6 @@ components:
       type: object
 
       properties:
-        email:
-          type: string
-          example: felix-at-home@mail.com
-
         token:
           type: string
           example: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4

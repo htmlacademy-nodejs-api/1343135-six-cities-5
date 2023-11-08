@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { BaseController } from '../../lib/rest/controller/base-controller.abstract.js';
 import { Logger } from '../../lib/logger/index.js';
 import { Component } from '../../types/component.enum.js';
-import { LoginUserRequest, SignupUserRequest } from './types.js';
+import { LoginUserRequest, SignupUserRequest } from './user.types.js';
 import { CreateUserDto, UserService } from './index.js';
 import { Config, RestConfigSchema } from '../../lib/config/index.js';
 import { fillDto } from '../../utils/common.js';
@@ -107,7 +107,7 @@ export class UserController extends BaseController {
 
   private async login(req: LoginUserRequest, res: Response) {
     const token = await this.authService.authenticate(req.body);
-    const data = fillDto(LoggedUserRdo, { token, email: req.body.email });
+    const data = fillDto(LoggedUserRdo, { token });
     this.ok(res, data);
   }
 

@@ -6,12 +6,4 @@ export class TokenPayload {
   @IsString()
   @IsMongoId()
     id: string;
-
-  @Expose()
-  @IsString()
-    email: string;
-
-  @Expose()
-  @IsString()
-    name: string;
 }
