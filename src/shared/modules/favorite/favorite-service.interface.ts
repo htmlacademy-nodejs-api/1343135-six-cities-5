@@ -1,11 +1,11 @@
-import { DocumentType } from '@typegoose/typegoose';
 import { Pagination } from '../../types/pagination.js';
-import { FavoriteEntity } from './favorite.entity.js';
-import { CreateFavoriteDto, DeleteFavoriteDto } from './index.js';
+import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity } from './index.js';
 import { OfferEntity } from '../offer/offer.entity.js';
 
 export interface FavoriteService {
-  findByUserId(userId: string, pagination?: Pagination): Promise<DocumentType<OfferEntity>[]>
-  create(dto: CreateFavoriteDto): Promise<DocumentType<FavoriteEntity>>
+  findByUserId(userId: string, pagination?: Pagination): Promise<OfferEntity[]>
+  create(dto: CreateFavoriteDto): Promise<FavoriteEntity>
   delete(dto: DeleteFavoriteDto): Promise<void>
+  getFavoriteOfferIds(offerIds: string[], userId?: string): Promise<string[]>
+  exists({ offerId, userId }: { offerId: string, userId: string }): Promise<boolean>
 }

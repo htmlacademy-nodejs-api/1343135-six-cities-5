@@ -4,13 +4,13 @@ import { Component } from '../../types/component.enum.js';
 import { Logger } from '../../lib/logger/logger.interface.js';
 import { Response } from 'express';
 import { HttpMethod } from '../../lib/rest/types/http-method.enum.js';
-import { CreateCommentRequest, IndexCommentRequest } from './types.js';
+import { CreateCommentRequest, IndexCommentRequest } from './comment.types.js';
 import { CommentService } from './comment-service.interface.js';
 import { fillDto, fillParams } from '../../utils/common.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { Pagination } from '../../types/pagination.js';
 import { ValidateObjectIdMiddleware } from '../../lib/rest/middleware/validate-objectid.middleware.js';
-import { DocumentExistsMiddleware, ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
+import { DocumentExistsMiddleware, PrivateRouteMiddleware, ValidateDtoMiddleware } from '../../lib/rest/middleware/index.js';
 import { CreateCommentDto } from './index.js';
 import { OfferService } from '../offer/index.js';
 import { UserService } from '../user/index.js';
@@ -30,23 +30,24 @@ export class CommentController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
+        new DocumentExistsMiddleware(
+          this.userService,
+          'User',
+          (req) => req.tokenPayload.id,
+        ),
         new ValidateDtoMiddleware(CreateCommentDto, (req) => req.body),
         new DocumentExistsMiddleware(
           this.offerService,
           'Offer',
           (req: CreateCommentRequest) => req.body.offerId,
         ),
-        new DocumentExistsMiddleware(
-          this.userService,
-          'User',
-          (req: CreateCommentRequest) => req.body.authorId,
-        ),
       ],
     });
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Get,
-      handler: this.show,
+      handler: this.index,
       middlewares: [
         new ValidateObjectIdMiddleware((req: IndexCommentRequest) => req.params.offerId),
         new DocumentExistsMiddleware(
@@ -59,12 +60,15 @@ export class CommentController extends BaseController {
   }
 
   private async create(req: CreateCommentRequest, res: Response) {
-    const comment = await this.commentService.create(req.body);
+    const comment = await this.commentService.create({
+      ...req.body,
+      authorId: req.tokenPayload.id,
+    });
 
     this.created(res, fillDto(CommentRdo, comment));
   }
 
-  private async show(req: IndexCommentRequest, res: Response) {
+  private async index(req: IndexCommentRequest, res: Response) {
     const comments = await this.commentService.findByOfferId(
       req.params.offerId,
       fillParams(Pagination, req.query)

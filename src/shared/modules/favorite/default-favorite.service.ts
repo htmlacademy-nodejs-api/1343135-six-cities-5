@@ -6,6 +6,7 @@ import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity, FavoriteService }
 import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
 import { OfferEntity } from '../offer/offer.entity.js';
+import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
 export class DefaultFavoriteService implements FavoriteService {
@@ -13,12 +14,11 @@ export class DefaultFavoriteService implements FavoriteService {
     @inject(Component.FavoriteModel) private readonly favoriteModel: types.ModelType<FavoriteEntity>
   ) {}
 
-  public async findByUserId(userId: string, pagination?: Pagination | undefined) {
-    const calculatedOffset = pagination?.offset ?? DefaultPaginationParams.offset;
-    const calculatedLimit = pagination?.limit ?? DefaultPaginationParams.limit;
+  public async findByUserId(userId: string, pagination?: Pagination) {
+    const { offset, limit } = getPaginationParams(pagination, DefaultPaginationParams);
 
-    const result = await this.favoriteModel
-      .aggregate<types.DocumentType<OfferEntity>>([
+    return this.favoriteModel
+      .aggregate<OfferEntity>([
         { $match: { user: new mongoose.Types.ObjectId(userId) }},
         {
           $lookup: {
@@ -32,10 +32,8 @@ export class DefaultFavoriteService implements FavoriteService {
         { $replaceWith: '$offers' },
       ])
       .sort({ createdAt: -1 })
-      .skip(calculatedOffset)
-      .limit(calculatedLimit);
-
-    return result;
+      .skip(offset)
+      .limit(limit);
   }
 
   public async create({ userId, offerId }: CreateFavoriteDto) {
@@ -45,10 +43,50 @@ export class DefaultFavoriteService implements FavoriteService {
       favorite = await this.favoriteModel.create({ user: userId, offer: offerId });
     }
 
-    return favorite;
+    return favorite.toObject();
   }
 
   public async delete({ userId, offerId }: DeleteFavoriteDto) {
     await this.favoriteModel.findOneAndRemove({ user: userId, offer: offerId });
+  }
+
+  public async getFavoriteOfferIds(offerIds: string[], userId?: string) {
+    if (!userId) {
+      return [];
+    }
+
+    const offers = await this.favoriteModel
+      .aggregate<Pick<OfferEntity, '_id'>>([
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(userId),
+            offer: {
+              $in: offerIds.map((id) => new mongoose.Types.ObjectId(id))
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'offers',
+            localField: 'offer',
+            foreignField: '_id',
+            as: 'offers',
+          }
+        },
+        { $unwind: '$offers' },
+        { $replaceWith: '$offers' },
+        {
+          $project: {
+            _id: true,
+          },
+        },
+      ]);
+
+    return offers.map((offer) => offer._id.toString());
+  }
+
+  public async exists({ offerId, userId}: { offerId: string, userId: string }) {
+    const existing = await this.favoriteModel.findOne({ offer: offerId, user: userId });
+    return Boolean(existing);
   }
 }

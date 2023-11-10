@@ -1,4 +1,5 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { Pagination } from '../types/pagination.js';
 
 export function getErrorObject(message: string) {
   return {
@@ -12,4 +13,11 @@ export function fillParams<Dto, Input>(dto: ClassConstructor<Dto>, input: Input)
 
 export function fillDto<Dto, Input>(dto: ClassConstructor<Dto>, input: Input) {
   return plainToInstance(dto, input, { excludeExtraneousValues: true });
+}
+
+export function getPaginationParams(custom: Pagination | undefined, fallback: Required<Pagination>): Required<Pagination> {
+  return {
+    limit: custom?.limit ?? fallback.limit,
+    offset: custom?.offset ?? fallback.offset,
+  };
 }

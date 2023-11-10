@@ -5,7 +5,7 @@ Content-Type: application/json
 
 {
   "name": "Pavel Mareev",
-  "email": "mareev4@gmail.com",
+  "email": "mareev2321@gmail.com",
   "type": "default",
   "password": "secret_01234",
   "avatar": "my-avatard.uk/felix.jpg"
@@ -18,19 +18,27 @@ POST http://localhost:3000/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "mareev.p@gmail.com",
+  "email": "mareev2321@gmail.com",
   "password": "secret_01234"
 }
 
 ###
 
+## Status
+GET http://localhost:3000/users/status HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NGE5NjE2ZTZiYmI2Njc5ZWZlZjMzMyIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5Mzg2OTEwLCJleHAiOjE2OTk1NTk3MTB9.Gk5p1FBFiGcrbGkmfiR-hVfObWQ_yUrmNi-TZvehxaM
+
+###
+
 ## Send avatar
 
-POST http://localhost:3000/users/652be4d978399a7fa78c099c/avatar HTTP/1.1
+POST http://localhost:3000/users/avatar HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NGE5NjE2ZTZiYmI2Njc5ZWZlZjMzMyIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5NDc0Mzg0LCJleHAiOjE2OTk2NDcxODR9.nTYEdXllQVxYfCgPKTvvSbij3YaOj5vZC_-jN8L1wII
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="avatar"; filename="983.jpg"
+Content-Disposition: form-data; name="fileName"; filename="983.jpg"
 Content-Type: image/jpeg
 
 < /Users/etpotato/Downloads/983.jpg

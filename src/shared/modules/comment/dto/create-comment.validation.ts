@@ -24,10 +24,5 @@ export const CreateCommentValidation = {
     message: {
       format: 'offerId must be a valid id'
     }
-  },
-  authorId: {
-    message: {
-      format: 'authorId must be a valid id'
-    }
   }
 } as const;

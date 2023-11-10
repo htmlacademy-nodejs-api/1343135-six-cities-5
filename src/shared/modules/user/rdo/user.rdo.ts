@@ -9,9 +9,6 @@ export class UserRdo {
   public name: string;
 
   @Expose()
-  public email: string;
-
-  @Expose()
   public type: UserTypeValue;
 
   @Expose()

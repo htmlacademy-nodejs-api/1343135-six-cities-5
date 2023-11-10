@@ -137,6 +137,9 @@ paths:
         "400":
           description: Invalid offer data is provided
 
+        "403":
+          description: Forbidden to update the offer
+
         "401":
           $ref: '#/components/responses/401'
 
@@ -167,6 +170,9 @@ paths:
 
         "400":
           description: Invalid request params
+
+        "403":
+          description: Forbidden to delete the offer
 
         "401":
           $ref: '#/components/responses/401'
@@ -207,7 +213,7 @@ paths:
     get:
       tags:
         - comments
-      summary: Get comment list
+      summary: Get comment list for specified offer
       description: Get the list of comments for specified offer
       parameters:
         - name: offerId
@@ -234,6 +240,32 @@ paths:
           description: Invalid request params
 
   /offers/favorite:
+    get:
+      tags:
+        - favorite
+      summary: Get favorite offers
+      description: Get the list of user's favorite offers
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+
+      responses:
+        "200":
+          description: List of the favorite offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerRdo'
+
+        "401":
+          $ref: '#/components/responses/401'
+
     post:
       tags:
         - favorite
@@ -247,17 +279,12 @@ paths:
         content:
           application/json:
             schema:
-              # TODO: fix after authorization is ready
               type: object
 
               properties:
                 offerId:
                   type: string
                   example: 6522aa1decfcf1bc655a2547
-
-                userId:
-                  type: string
-                  example: 652be40f1dc314f63108b51b
 
         required: true
 
@@ -267,7 +294,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/offerRdo'
+                type: object
+
+                properties:
+                  offerId:
+                    type: string
+                    example: 6522aa1decfcf1bc655a2547
 
         "400":
           description: Invalid offer data is provided
@@ -275,7 +307,7 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/favorite/{offerId}/{userId}:
+  /offers/favorite/{offerId}:
     delete:
       tags:
         - favorite
@@ -293,13 +325,6 @@ paths:
             type: string
             example: 6522aa1decfcf1bc655a2547
 
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: 652be40f1dc314f63108b51b
-
       responses:
         "204":
           description: Offer is deleted from favorite
@@ -310,39 +335,8 @@ paths:
         "401":
           $ref: '#/components/responses/401'
 
-  /offers/favorite/{userId}:
-    get:
-      tags:
-        - favorite
-      summary: Get favorite offers
-      description: Get the list of user's favorite offers
-
-      security:
-        - BearerAuth: []
-
-      parameters:
-        # TODO: remove after authorization is ready
-        - name: userId
-          required: true
-          in: path
-          schema:
-            type: string
-            example: 652be40f1dc314f63108b51b
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
-
-      responses:
-        "200":
-          description: List of the favorite offers
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/offerRdo'
-
-        "401":
-          $ref: '#/components/responses/401'
+        "403":
+          description: Forbidden
 
   /offers/premium/{city}:
     get:
@@ -425,28 +419,15 @@ paths:
         required: true
 
       responses:
-        "204":
+        "200":
           description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRdo'
 
         "400":
           description: Invalid login data is provided
-
-  /users/logout:
-    get:
-      tags:
-        - users
-      summary: Logout
-      description: Logout user
-
-      security:
-        - BearerAuth: []
-
-      responses:
-        "204":
-          description: Logged out successfully
-
-        "401":
-          $ref: '#/components/responses/401'
 
   /users/status:
     get:
@@ -465,6 +446,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/userRdo'
+
+        "401":
+          $ref: '#/components/responses/401'
+
+  /users/avatar:
+    post:
+      tags:
+        - users
+      summary: Upload avatar image
+      description: Upload avatar image
+
+      requestBody:
+        description: Avatar image
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                  format: binary
+
+        required: true
+
+      responses:
+        "200":
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file:
+                    type: string
+                    example: 'upload/Je3yX8q5-17LJAQr5qKCR.jpeg'
+
+        "400":
+          description: Invalid file format
 
         "401":
           $ref: '#/components/responses/401'
@@ -685,7 +704,6 @@ components:
         - type
 
       properties:
-
         name:
           type: string
           example: Felix
@@ -718,16 +736,20 @@ components:
           type: string
           example: Felix
 
-        email:
-          type: string
-          example: felix-at-home@mail.com
-
         type:
           $ref: '#/components/schemas/userType'
 
         avatar:
           type: string
           example: http://my_avatar.uk/felix.jpg
+
+    loggedUserRdo:
+      type: object
+
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY1NDdiNDA2MmM1NWVhZDI5MTRiOTdkNCIsImVtYWlsIjoibWFyZWV2MjMyMUBnbWFpbC5jb20iLCJuYW1lIjoiUGF2ZWwgTWFyZWV2IiwiaWF0IjoxNjk5MTk4MjE2LCJleHAiOjE2OTkyMDE4MTZ9.BawBdMsN_J3uAsPyJ_X_Xo2HuuMTAlZzYmCjianWYM4
 
     city:
       enum:
@@ -784,10 +806,6 @@ components:
         offerId:
           type: string
           example: 6522aa1decfcf1bc655a2538
-
-        authorId:
-          type: string
-          example: 652be40f1dc314f63108b51b
 
     commentRdo:
       type: object
