@@ -46,7 +46,7 @@ export class OfferController extends BaseController {
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req: CreateOfferRequest) => req.tokenPayload.id,
+          (req: CreateOfferRequest) => req.tokenPayload!.id,
         ),
       ]
     });
@@ -103,7 +103,7 @@ export class OfferController extends BaseController {
     const offers = await this.offerService.find(
       fillParams(Pagination, req.query)
     );
-    const result = await this.populateIsFavorite(offers, req.tokenPayload.id);
+    const result = await this.populateIsFavorite(offers, req.tokenPayload?.id);
 
     this.ok(res, fillDto(OfferShortRdo, result));
   }
@@ -111,7 +111,7 @@ export class OfferController extends BaseController {
   private async create(req: CreateOfferRequest, res: Response) {
     const offer = await this.offerService.create({
       ...req.body,
-      authorId: req.tokenPayload.id
+      authorId: req.tokenPayload!.id
     });
 
     return this.created(res, fillDto(OfferRdo, offer));
@@ -120,7 +120,9 @@ export class OfferController extends BaseController {
   private async show(req: ShowOfferRequest, res: Response) {
     const userId = req.tokenPayload?.id;
     const offer = await this.offerService.findById(req.params.id);
-    const isFavorite = await this.favoriteService.exists({ userId, offerId: req.params.id });
+    const isFavorite = userId
+      ? await this.favoriteService.exists({ userId, offerId: req.params.id })
+      : false;
 
     return this.ok(res, fillDto(OfferRdo, { ...offer?.toObject(), isFavorite }));
   }
@@ -155,13 +157,16 @@ export class OfferController extends BaseController {
       req.params.city,
       fillParams(Pagination, req.query)
     );
-    const result = await this.populateIsFavorite(offers, req.tokenPayload.id);
+    const result = await this.populateIsFavorite(offers, req.tokenPayload?.id);
 
     this.ok(res, fillDto(OfferShortRdo, result));
   }
 
   private async checkAuthor(req: UpdateOfferRequest | DeleteOfferRequest) {
-    if(!await this.offerService.isAuthor(req.params.id, req.tokenPayload.id)) {
+    if(
+      !req.tokenPayload?.id ||
+      !await this.offerService.isAuthor(req.params.id, req.tokenPayload.id)
+    ) {
       throw new HttpError(
         StatusCodes.FORBIDDEN,
         'Forbidden',

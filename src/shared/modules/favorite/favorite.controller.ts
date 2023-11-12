@@ -35,11 +35,11 @@ export class FavoriteController extends BaseController {
       handler: this.index,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new ValidateObjectIdMiddleware((req) => req.tokenPayload.id),
+        new ValidateObjectIdMiddleware((req) => req.tokenPayload!.id),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req: IndexFavoriteRequest) => req.tokenPayload.id,
+          (req: IndexFavoriteRequest) => req.tokenPayload!.id,
         )
       ] });
     this.addRoute({
@@ -48,11 +48,11 @@ export class FavoriteController extends BaseController {
       handler: this.create,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new ValidateObjectIdMiddleware((req) => req.tokenPayload.id),
+        new ValidateObjectIdMiddleware((req) => req.tokenPayload!.id),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req) => req.tokenPayload.id,
+          (req) => req.tokenPayload!.id,
         ),
         new ValidateDtoMiddleware(CreateFavoriteDto, (req) => req.body),
         new DocumentExistsMiddleware(
@@ -68,11 +68,11 @@ export class FavoriteController extends BaseController {
       handler: this.delete,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new ValidateObjectIdMiddleware((req: DeleteFavoriteRequest) => req.tokenPayload.id),
+        new ValidateObjectIdMiddleware((req: DeleteFavoriteRequest) => req.tokenPayload!.id),
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req) => req.tokenPayload.id,
+          (req) => req.tokenPayload!.id,
         ),
         new ValidateObjectIdMiddleware((req: DeleteFavoriteRequest) => req.params.offerId),
         new DocumentExistsMiddleware(
@@ -86,7 +86,7 @@ export class FavoriteController extends BaseController {
 
   private async index(req: IndexFavoriteRequest, res: Response) {
     const favoriteList = await this.favoriteService.findByUserId(
-      req.tokenPayload.id,
+      req.tokenPayload!.id,
       fillParams(Pagination, req.query)
     );
     const result = favoriteList.map((offer) => ({ ...offer, isFavorite: true }));
@@ -97,7 +97,7 @@ export class FavoriteController extends BaseController {
   private async create(req: CreateFavoriteRequest, res: Response) {
     const favorite = await this.favoriteService.create({
       offerId: req.body.offerId,
-      userId: req.tokenPayload.id,
+      userId: req.tokenPayload!.id,
     });
 
     this.created(res, fillDto(CreateFavoriteRdo, favorite));
@@ -106,7 +106,7 @@ export class FavoriteController extends BaseController {
   private async delete(req: DeleteFavoriteRequest, res: Response) {
     await this.favoriteService.delete({
       offerId: req.params.offerId,
-      userId: req.tokenPayload.id,
+      userId: req.tokenPayload!.id,
     });
     this.noContent(res);
   }

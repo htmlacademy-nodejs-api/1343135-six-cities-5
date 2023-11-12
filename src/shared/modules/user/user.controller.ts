@@ -63,7 +63,7 @@ export class UserController extends BaseController {
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req) => req.tokenPayload.id),
+          (req) => req.tokenPayload!.id),
       ],
     });
     this.addRoute({
@@ -75,7 +75,7 @@ export class UserController extends BaseController {
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req) => req.tokenPayload.id),
+          (req) => req.tokenPayload!.id),
         new ValidateDtoMiddleware(UpdateUserDto, (req) => req.body),
         new FileUploadMiddleware(
           this.config.get('UPLOAD_DIR'),
@@ -112,12 +112,12 @@ export class UserController extends BaseController {
   }
 
   private async status(req: Request, res: Response) {
-    const user = await this.userService.findById(req.tokenPayload.id);
+    const user = await this.userService.findById(req.tokenPayload!.id);
     this.ok(res, fillDto(UserRdo, user));
   }
 
   private async uploadAvatar(req: Request, res: Response) {
-    this.userService.update(req.tokenPayload.id, { avatar: req.file?.path });
+    this.userService.update(req.tokenPayload!.id, { avatar: req.file?.path });
     this.created(res, { file: req.file?.path });
   }
 }

@@ -34,7 +34,7 @@ export class CommentController extends BaseController {
         new DocumentExistsMiddleware(
           this.userService,
           'User',
-          (req) => req.tokenPayload.id,
+          (req) => req.tokenPayload!.id,
         ),
         new ValidateDtoMiddleware(CreateCommentDto, (req) => req.body),
         new DocumentExistsMiddleware(
@@ -62,7 +62,7 @@ export class CommentController extends BaseController {
   private async create(req: CreateCommentRequest, res: Response) {
     const comment = await this.commentService.create({
       ...req.body,
-      authorId: req.tokenPayload.id,
+      authorId: req.tokenPayload!.id,
     });
 
     this.created(res, fillDto(CommentRdo, comment));
