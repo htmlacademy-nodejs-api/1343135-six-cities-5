@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import express, { Express } from 'express';
+import cors from 'cors';
 import { RestConfigSchema, Config } from '../shared/lib/config/index.js';
 import { Logger } from '../shared/lib/logger/logger.interface.js';
 import { Component } from '../shared/types/component.enum.js';
@@ -46,6 +47,7 @@ export class RestApplication {
       express.static(this.config.get('UPLOAD_DIR'))
     );
     this.server.use(parseTokenMiddleware.execute.bind(parseTokenMiddleware));
+    this.server.use(cors());
   }
 
   private initControllers() {

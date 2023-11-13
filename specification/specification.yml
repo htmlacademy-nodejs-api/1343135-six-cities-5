@@ -457,6 +457,9 @@ paths:
       summary: Upload avatar image
       description: Upload avatar image
 
+      security:
+        - BearerAuth: []
+
       requestBody:
         description: Avatar image
         content:
