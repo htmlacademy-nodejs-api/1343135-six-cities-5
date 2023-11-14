@@ -32,13 +32,3 @@ export function getRandomChunk<T>(arr: T[], count?: number): T[] {
 export function getRandomBoolean() {
   return Math.random() > 0.5;
 }
-
-export function getRandomDate(min: Date, max: Date) {
-  if (min >= max) {
-    throw new Error('Invalid arguments: max date should be bigger than min');
-  }
-
-  const randomTimestamp = getRandomNumber(min.valueOf(), max.valueOf());
-  return new Date(randomTimestamp);
-}
-
