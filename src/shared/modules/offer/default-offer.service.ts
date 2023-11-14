@@ -20,11 +20,9 @@ export class DefaultOfferService implements OfferService {
   ) {}
 
   public async create(dto: CreateOfferDto) {
-    const offer = (
+    return (
       await this.offerModel.create({...dto, author: dto.authorId })
     ).populate('author');
-
-    return offer;
   }
 
   public async findById(id: string) {

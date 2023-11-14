@@ -5,7 +5,7 @@ import { Pagination } from '../../types/pagination.js';
 import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity, FavoriteService } from './index.js';
 import { DefaultPaginationParams } from './consts.js';
 import { Component } from '../../types/component.enum.js';
-import { OfferEntity } from '../offer/offer.entity.js';
+import { OfferEntity } from '../offer/index.js';
 import { getPaginationParams } from '../../utils/common.js';
 
 @injectable()
