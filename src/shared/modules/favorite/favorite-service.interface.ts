@@ -1,6 +1,6 @@
 import { Pagination } from '../../types/pagination.js';
 import { CreateFavoriteDto, DeleteFavoriteDto, FavoriteEntity } from './index.js';
-import { OfferEntity } from '../offer/offer.entity.js';
+import { OfferEntity } from '../offer/index.js';
 
 export interface FavoriteService {
   findByUserId(userId: string, pagination?: Pagination): Promise<OfferEntity[]>

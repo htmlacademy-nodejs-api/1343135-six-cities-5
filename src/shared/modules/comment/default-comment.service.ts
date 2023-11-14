@@ -17,14 +17,12 @@ export class DefaultCommentService implements CommentService {
   public async findByOfferId(id: string, pagination?: Pagination) {
     const { offset, limit } = getPaginationParams(pagination, DefaultPaginationParams);
 
-    const comments = await this.commentModel
+    return this.commentModel
       .find({ offer: id })
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
       .populate('author');
-
-    return comments;
   }
 
   public async create(dto: CreateCommentDto) {
